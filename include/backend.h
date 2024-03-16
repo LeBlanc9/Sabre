@@ -13,7 +13,6 @@ private:
 
 public:
     Backend();
-    //Backend(CouplingList c_list); 
-    Backend(std::vector<std::tuple<int, int, float>>);
+    Backend(CouplingList c_list); 
     Backend(CouplingList c_list, int qubits_num); 
 };

@@ -5,9 +5,11 @@
 class Model
 {
 private:
-    Backend& _backend;
+    Backend _backend;
 
 public:
-    Model(Backend& backend);
-    Backend& get_backend(); 
+    Model();
+    Model(Backend backend);
+
+    Backend get_backend(); 
 };

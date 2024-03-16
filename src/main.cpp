@@ -18,8 +18,9 @@ CouplingList get_default_clist() {
 
 
 int main() {
-    std::cout << "Hello" << std::endl;
+    std::cout << "-- main function --" << std::endl;
 
     CouplingList c_list = get_default_clist();
     Backend backend(c_list);
+    Model model;
 }

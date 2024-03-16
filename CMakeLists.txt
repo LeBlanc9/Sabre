@@ -11,7 +11,7 @@ find_package(Python 3.10 COMPONENTS Interpreter Development REQUIRED)
 
 include_directories("include" "extern/pybind11/include")
 ##! Test CPP
-add_executable(sabre_cpp src/main.cpp src/backend.cpp)
+add_executable(sabre_cpp src/main.cpp src/backend.cpp src/model.cpp)
 
 
 ##! Test pybind
