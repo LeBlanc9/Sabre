@@ -1,0 +1,6 @@
+build/
+.vscode/
+
+
+# For MacOS
+.DS_Store
