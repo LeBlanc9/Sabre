@@ -1,8 +1,10 @@
 #include <sabre_routing.h>
+#include <sabre.h>
 #include <iostream>
 #include <memory>
-#include <sabre.h>
 
+
+SabreRouting::SabreRouting() {}
 
 SabreRouting::SabreRouting(Model model) : model(model) {
     std::cout << "Creating SabreRouting" << std::endl;

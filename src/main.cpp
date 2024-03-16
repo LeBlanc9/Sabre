@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sabre_layout.h>
 #include <sabre.h>
 
 
@@ -20,7 +21,9 @@ CouplingList get_default_clist() {
 int main() {
     std::cout << "-- main function --" << std::endl;
 
-    CouplingList c_list = get_default_clist();
-    Backend backend(c_list);
-    Model model;
+    // CouplingList c_list = get_default_clist();
+    // Backend backend(c_list);
+    // Model model;
+
+    SabreLayout sabreLayout;
 }

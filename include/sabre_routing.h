@@ -1,10 +1,8 @@
 #include <iostream>
 #include <memory>
+#include <model.h>
 
-#include <sabre.h>
-
-
-class SabreRouting 
+class SabreRouting
 {
 private:
     Model model;
