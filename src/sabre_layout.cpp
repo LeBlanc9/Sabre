@@ -15,3 +15,5 @@ Model SabreLayout::get_model() {
 }
 
 void SabreLayout::run() {}
+
+void SabreLayout::run_single() {}

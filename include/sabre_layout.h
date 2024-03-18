@@ -15,7 +15,8 @@ public:
 
     SabreLayout();
 
-    void set_model(Model model); 
+    void set_model(Model model);
     Model get_model();
     void run();
+    void run_single();
 };

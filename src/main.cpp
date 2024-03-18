@@ -1,22 +1,26 @@
 #include <iostream>
-#include <sabre_layout.h>
-#include <sabre.h>
+#include "sabre_layout.h"
+#include "dag_cuit.h"
+#include "vis.h"
 
+#include <boost/graph/graphviz.hpp>
+#include <graphviz/gvc.h>
+void test_dag() {
+    InstructionNode node1("www");
+    InstructionNode node2("222");
 
-CouplingList get_default_clist() {
-    CouplingList c_list = {
-        std::make_tuple(0, 1, 0.95),
-        std::make_tuple(1, 0, 0.95),
-        std::make_tuple(1, 2, 0.99),
-        std::make_tuple(2, 3, 0.96),
-        std::make_tuple(2, 1, 0.99),
-        std::make_tuple(3, 2, 0.96),
-        std::make_tuple(3, 4, 0.9),
-        std::make_tuple(4, 3, 0.9)
-    };
-    return c_list;
+    Graph graph;
+    auto v1 = boost::add_vertex(node1, graph);
+    auto v2 = boost::add_vertex(node2, graph);
+    boost::add_edge(0,1, graph);
+
+    std::cout << graph[v1].name << std::endl;
+    std::cout << graph[v2].name << std::endl;
+
+    //DAGCircuit dag_cuit(graph);
+    draw_graph(graph);     
+
 }
-
 
 int main() {
     std::cout << "-- main function --" << std::endl;
@@ -25,5 +29,8 @@ int main() {
     // Backend backend(c_list);
     // Model model;
 
-    SabreLayout sabreLayout;
+    //SabreLayout sabreLayout;
+    //DAGCircuit dag;
+    test_dag();
+    return 0;
 }
