@@ -1,6 +1,9 @@
 build/
 .vscode/
 
+# For visualization temp file
+*.dot
+*.png
 
 # For MacOS
 .DS_Store

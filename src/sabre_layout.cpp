@@ -1,4 +1,5 @@
 #include "sabre_layout.h"
+#include "dag_cuit.h"
 #include <iostream>
 
 
@@ -14,6 +15,14 @@ Model SabreLayout::get_model() {
     return this->model; 
 }
 
-void SabreLayout::run() {}
+void SabreLayout::run(DAGCircuit& dag) {
+    std::cout << "Run sabre layout !" << std::endl;
 
-void SabreLayout::run_single() {}
+    for (int i; i < max_iteration; i++) {
+
+    }
+}
+
+void SabreLayout::run_single(DAGCircuit& dag) {
+    this->routing_pass.run(dag);
+}

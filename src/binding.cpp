@@ -1,8 +1,13 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <sabre.h>
-#include "sabre_routing.cpp"
+#include "backend.h"
+#include "vis.h"
+#include "model.h"
+#include "type.h"
+#include "sabre_layout.h"
+#include "sabre_routing.h"
 #include "dag_cuit.h"
+
 
 namespace py = pybind11;
 
@@ -27,9 +32,17 @@ PYBIND11_MODULE(sabre, m) {
 
     py::class_<InstructionNode>(m, "InstructionNode")
         .def(py::init<>())
-        .def(py::init<const std::string>())
-        .def_readwrite("name", &InstructionNode::name);
+        .def(py::init<int ,const std::string>())
+        .def_readwrite("name", &InstructionNode::name)
+        .def_readwrite("label", &InstructionNode::label)
+        .def_readwrite("pos", &InstructionNode::pos)
+        .def_readwrite("measure_pos", &InstructionNode::measure_pos);
 
     py::class_<DAGCircuit>(m, "DAGCircuit")
-        .def(py::init<>());
+        .def(py::init<>())
+        .def("add_node", &DAGCircuit::add_node)
+        .def("draw_self", &DAGCircuit::draw_self)
+        .def_readwrite("graph", &DAGCircuit::graph);
+
+    //m.def("draw_graph", &draw_graph, "Draw a Graph object");
 }

@@ -1,7 +1,5 @@
 #include <sabre_routing.h>
-#include <sabre.h>
 #include <iostream>
-#include <memory>
 
 
 SabreRouting::SabreRouting() {}
@@ -18,4 +16,8 @@ Model SabreRouting::get_model() {
     return model;
 }
 
-void SabreRouting::run(){}
+void SabreRouting::run(DAGCircuit& dag) {
+    std::cout << "Run sabre routing !" << std::endl;
+ 
+    
+}

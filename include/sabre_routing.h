@@ -2,6 +2,7 @@
 #include <iostream>
 #include <memory>
 #include <model.h>
+#include "dag_cuit.h"
 
 class SabreRouting
 {
@@ -20,5 +21,5 @@ public:
 
     void set_model(Model model);
     Model get_model();
-    void run(); 
+    void run(DAGCircuit& dag); 
 };

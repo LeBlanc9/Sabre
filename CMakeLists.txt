@@ -33,4 +33,6 @@ target_link_libraries(sabre_cpp ${Boost_LIBRARIES}) # Boost
 
 ##! Test pybind
 add_subdirectory("extern/pybind11")
-pybind11_add_module(sabre src/binding.cpp src/backend.cpp src/model.cpp)
+pybind11_add_module(sabre src/binding.cpp ${SOURCES})
+target_link_libraries(sabre PRIVATE gvc cgraph)         # Graphviz
+target_link_libraries(sabre PRIVATE ${Boost_LIBRARIES}) # Boost

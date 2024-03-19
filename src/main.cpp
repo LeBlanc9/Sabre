@@ -5,20 +5,20 @@
 
 #include <boost/graph/graphviz.hpp>
 #include <graphviz/gvc.h>
-void test_dag() {
-    InstructionNode node1("www");
-    InstructionNode node2("222");
 
+void test_dag() {
+    InstructionNode node1{-1,"www"};
+    InstructionNode node2{-2,"222"};
+
+    
     Graph graph;
+    
     auto v1 = boost::add_vertex(node1, graph);
     auto v2 = boost::add_vertex(node2, graph);
     boost::add_edge(0,1, graph);
 
-    std::cout << graph[v1].name << std::endl;
-    std::cout << graph[v2].name << std::endl;
-
-    //DAGCircuit dag_cuit(graph);
-    draw_graph(graph);     
+    DAGCircuit dag{graph};
+    dag.draw_self();
 
 }
 

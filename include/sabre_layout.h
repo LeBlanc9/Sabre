@@ -2,7 +2,8 @@
 #include <string>
 #include <type.h>
 #include <model.h>
-#include <sabre_routing.h>
+#include "sabre_routing.h"
+#include "dag_cuit.h" 
 
 class SabreLayout
 {
@@ -17,6 +18,6 @@ public:
 
     void set_model(Model model);
     Model get_model();
-    void run();
-    void run_single();
+    void run(DAGCircuit& dag);
+    void run_single(DAGCircuit& dag);
 };
