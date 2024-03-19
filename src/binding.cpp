@@ -34,13 +34,20 @@ PYBIND11_MODULE(sabre, m) {
         .def(py::init<>())
         .def(py::init<int ,const std::string>())
         .def_readwrite("name", &InstructionNode::name)
-        .def_readwrite("label", &InstructionNode::label)
+        .def_readwrite("id", &InstructionNode::id)
         .def_readwrite("pos", &InstructionNode::pos)
         .def_readwrite("measure_pos", &InstructionNode::measure_pos);
+
+    py::class_<EdgeProperties>(m, "EdgeProperties")
+        .def(py::init<>())
+        .def(py::init<int>())
+        .def_readwrite("id", &EdgeProperties::id);
 
     py::class_<DAGCircuit>(m, "DAGCircuit")
         .def(py::init<>())
         .def("add_node", &DAGCircuit::add_node)
+        .def("add_edge", &DAGCircuit::add_edge)
+        .def("get_num_nodes", &DAGCircuit::get_num_nodes)
         .def("draw_self", &DAGCircuit::draw_self)
         .def_readwrite("graph", &DAGCircuit::graph);
 

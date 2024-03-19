@@ -10,7 +10,6 @@ void test_dag() {
     InstructionNode node1{-1,"www"};
     InstructionNode node2{-2,"222"};
 
-    
     Graph graph;
     
     auto v1 = boost::add_vertex(node1, graph);

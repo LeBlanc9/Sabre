@@ -9,9 +9,9 @@ sys.path.append("/Users/air/workspace/qusteed")
 from qusteed.dag.dag_circuit import DAGCircuit
 from qusteed.dag.circuit_dag  import circuit_to_dag, dag_to_circuit, draw_dag
 from qusteed.dag.instruction_node import InstructionNode 
-
 from quafu import QuantumCircuit
 
+from utils import *
 
 
 def test(): 
@@ -35,38 +35,6 @@ def test():
 
     cpp_dag = dag_to_cppDag(dag)
     cpp_dag.draw_self()
-
-
-def dag_to_cppDag(dag: DAGCircuit) -> Cpp_DAGCircuit:
-    cppDag = Cpp_DAGCircuit();
-
-    for node in dag.nodes(data=True):
-        cpp_node = node_to_cppNode(node[0])
-        cppDag.add_node(cpp_node)
-    return cppDag 
-
-
-def node_to_cppNode(node: InstructionNode) -> Cpp_InstructionNode:
-    cpp_node = Cpp_InstructionNode()
-
-    ##* start_node & end_node
-    if node == -1:
-        cpp_node.name = "start"
-        cpp_node.label = -1
-        return cpp_node
-    if node == float('inf'):
-        cpp_node.name = "end"
-        cpp_node.label = -2
-        return cpp_node
-
-    ##* pass pos
-    cpp_node.name = node.name 
-    if isinstance(node.pos, list):
-        cpp_node.pos = node.pos
-    elif isinstance(node.pos, dict):
-        cpp_node.measure_pos = node.pos
-
-    return cpp_node
 
 
 if __name__ == "__main__":
