@@ -3,7 +3,7 @@
 #include "backend.h"
 #include "vis.h"
 #include "model.h"
-#include "type.h"
+#include "coupling.h"
 #include "sabre_layout.h"
 #include "sabre_routing.h"
 #include "dag_cuit.h"
@@ -30,13 +30,19 @@ PYBIND11_MODULE(sabre, m) {
         .def(py::init<Backend>());
 
 
+    py::class_<CouplingCircuit>(m, "CouplingCircuit")
+        .def(py::init<>())
+        .def(py::init<CouplingList>())
+        .def("get_num_qubits", &CouplingCircuit::get_num_qubits)
+        .def("draw_self", &CouplingCircuit::draw_self);
+
+
     py::class_<InstructionNode>(m, "InstructionNode")
         .def(py::init<>())
-        .def(py::init<int ,const std::string>())
+        .def(py::init<const std::string>())
         .def_readwrite("name", &InstructionNode::name)
-        .def_readwrite("id", &InstructionNode::id)
-        .def_readwrite("pos", &InstructionNode::pos)
-        .def_readwrite("measure_pos", &InstructionNode::measure_pos);
+        .def_readwrite("qubit_pos", &InstructionNode::qubit_pos)
+        .def_readwrite("classic_pos", &InstructionNode::classic_pos);
 
     py::class_<EdgeProperties>(m, "EdgeProperties")
         .def(py::init<>())

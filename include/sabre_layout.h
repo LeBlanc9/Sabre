@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
-#include <type.h>
-#include <model.h>
+#include "coupling.h"
+#include "model.h"
 #include "sabre_routing.h"
 #include "dag_cuit.h" 
 

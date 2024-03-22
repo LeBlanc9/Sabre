@@ -1,6 +1,5 @@
 #include "vis.h"
 #include <iostream>
-#include <string>
 #include <sstream>
 #include <vector>
 
@@ -13,50 +12,77 @@ std::string vectorToString(const std::vector<int>& vec) {
     return ss.str();
 }
 
-
-class InstructionNodeWriter {
+class DagNodeWriter {
 public:
-    Graph g;
-    InstructionNodeWriter(Graph g) : g(g) {}
+    DagGraph g;
+    DagNodeWriter(DagGraph g) : g(g) {}
 
     template <typename VertexDescriptor, typename OutputStream>
     void operator()(OutputStream& os, VertexDescriptor v) const {
         const auto& node = g[v];
-        os << "[label=\"" << "{" << node.id << node.name << "("<< vectorToString(node.pos) << ")" << "}" << "\"]";
+        os << "[label=\"" << "{" << node.name << "("<< vectorToString(node.qubit_pos) << ")" << "}" << "\"]";
     }
 };
 
-class EdgeWriter {
+class DagEdgeWriter {
 public:
-    Graph g;
-    EdgeWriter(Graph g) : g(g) {}
+    DagGraph g;
+    DagEdgeWriter(DagGraph g) : g(g) {}
 
     template <typename EdgeDescriptor, typename OutputStream>
     void operator()(OutputStream& os, EdgeDescriptor e) const {
-        const auto& ep = g[e];
-        os << "[label=\"" << "q" << ep.id << "\"]";
+        const auto& edge = g[e];
+    os << "[label=\"" << "q" << edge.id << "\"]";
     }
 };
 
 
+class CouplingNodeWriter {
+public:
+    CouplingGraph g;
+    CouplingNodeWriter(CouplingGraph g) : g(g) {}
 
-void draw_graph(Graph& graph) {
-    GVC_t *gvc = gvContext();
+    template <typename VertexDescriptor, typename OutputStream>
+    void operator()(OutputStream& os, VertexDescriptor v) const {
+        const auto& node = g[v];
+        os << "[label=\"" << node.id << "\"]";
+    }
+};
 
-    std::cout << "drawing" << std::endl;
+class CouplingEdgeWriter {
+public:
+    CouplingGraph g;
+    CouplingEdgeWriter(CouplingGraph g) : g(g) {}
 
-    //  Boost -> Graphviz -> dot_str
+    template <typename EdgeDescriptor, typename OutputStream>
+    void operator()(OutputStream& os, EdgeDescriptor e) const {
+        const auto& edge = g[e];
+        os << "[label=\"" << edge.fidelity << "\"]";
+    }
+};
+
+std::string graph_to_dot(DagGraph& graph) {
     std::ostringstream os;
+    boost::write_graphviz(os, graph, DagNodeWriter(graph), DagEdgeWriter(graph));
+    return os.str();
+}
 
-    boost::write_graphviz(os, graph, InstructionNodeWriter(graph), EdgeWriter(graph));
-                                
-    std::string dot_str = os.str();
+std::string graph_to_dot(CouplingGraph& graph) {
+    std::ostringstream os;
+    boost::write_graphviz(os, graph, CouplingNodeWriter(graph), CouplingEdgeWriter(graph));
+    return os.str();
+}
+
+
+void draw_dot(std::string dot_str) {
+    std::cout << "-- drawing" << std::endl;
 
     // save .dot file
     std::ofstream dot_file("output.dot");
     dot_file << dot_str;
     dot_file.close();
 
+    GVC_t *gvc = gvContext();
     // 使用 agmemread() 读取 Graphviz 字符串, c_str() in Temporary buffer
     Agraph_t *g = agmemread(dot_str.c_str());
 

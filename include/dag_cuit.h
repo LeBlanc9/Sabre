@@ -8,15 +8,15 @@
 #include <graphviz/gvc.h>
 
 struct InstructionNode {
-    int id;  // -1=start; -2=end; -3=measure
     std::string name = "NoName";  // 门操作的名称
-    std::vector<int> pos;
-    std::unordered_map<int, int> measure_pos = {};
+    std::vector<int> qubit_pos;
+    //std::unordered_map<int, int> measure_pos = {};
+    std::vector<int> classic_pos;
 
 
     InstructionNode();
-    InstructionNode(int label, const std::string& name);
-    InstructionNode(int label, const std::string& operation, std::vector<int> pos);
+    InstructionNode(const std::string& name);
+    InstructionNode(const std::string& operation, std::vector<int> pos);
 };
 
 struct EdgeProperties {
@@ -28,7 +28,7 @@ public:
     EdgeProperties(int id);
 };
 
-using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
+using DagGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
                                     InstructionNode,
                                     EdgeProperties>;
 
@@ -36,10 +36,10 @@ using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
 class DAGCircuit {
 
 public:
-    Graph graph;
+    DagGraph graph;
 
     DAGCircuit();
-    DAGCircuit(Graph& graph);
+    DAGCircuit(DagGraph& graph);
     
     void add_node(InstructionNode node);
     void add_edge(int from, int to, EdgeProperties ep);
@@ -48,4 +48,4 @@ public:
     void draw_self();
 };
 
-Graph reverse_dag(Graph& graph);
+DagGraph reverse_dag(DagGraph& graph);

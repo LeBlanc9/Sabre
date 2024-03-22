@@ -20,47 +20,38 @@ def dag_to_cppDag(dag: DAGCircuit) -> Cpp_DAGCircuit:
 
     # Add node
     for index, node in enumerate(dag.nodes(data=True)):
-        cpp_node = node_to_cppNode(node[0], index)
+        #print(f"index:{index}, node:{node}") 
+        cpp_node = node_to_cppNode(node[0])
         cppDag.add_node(cpp_node)
 
+    node_to_index = {node_name: index for index, node_name in enumerate(dag.nodes())}
     # Add edge
     for u, v, data in dag.edges(data=True):
-        ep = EdgeProperties(int(data['label'][1]))
         #print(f"Edge from {u} to {v} with label {data['label']}")
-        if u == -1: 
-            start=0
-        else: start = u.label+1
+        ep = EdgeProperties(int(data['label'][1]))
+        cppDag.add_edge(node_to_index[u], node_to_index[v], ep)
 
-        if v == float("inf"): 
-            end = cppDag.get_num_nodes() -1
-        elif v.label != 'm':
-            end = v.label+1
-
-        cppDag.add_edge(start, end, ep)
-    return cppDag 
+    return cppDag
 
 
-def node_to_cppNode(node: InstructionNode, index=0) -> Cpp_InstructionNode:
+def node_to_cppNode(node: InstructionNode) -> Cpp_InstructionNode:
     cpp_node = Cpp_InstructionNode()
 
     # start_node & end_node
     if node == -1:
         cpp_node.name = "start"
-        cpp_node.id = -1
         return cpp_node
     if node == float('inf'):
         cpp_node.name = "end"
-        cpp_node.id = -2
         return cpp_node
     else:
-        cpp_node.id = index - 1
         cpp_node.name = node.name 
-
 
     # pass pos
     if isinstance(node.pos, list):
-        cpp_node.pos = node.pos
+        cpp_node.qubit_pos = node.pos
     elif isinstance(node.pos, dict):
-        cpp_node.measure_pos = node.pos
+        cpp_node.qubit_pos = list(node.pos.keys())
+        cpp_node.classic_pos = list(node.pos.values())
 
     return cpp_node
