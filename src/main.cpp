@@ -1,6 +1,6 @@
 #include <iostream>
 #include "sabre_layout.h"
-#include "dag_cuit.h"
+#include "dag.h"
 #include "coupling.h"
 #include "vis.h"
 
@@ -20,33 +20,36 @@ void test_dag() {
 
 
     //boost::remove_vertex(v2, graph);
-    boost::add_edge(0,1, graph);
+    boost::add_edge(0,1,EdgeProperties{1}, graph);
+    boost::add_edge(1,2,EdgeProperties{1}, graph);
+    boost::add_edge(2,0,EdgeProperties{1}, graph);
 
-    //std::cout << typeid(decltype(graph[v1])).name() << std::endl;
-    std::cout << graph[v1].name << std::endl;
-    std::cout << graph[10].name << std::endl;
     //std::cout << graph[2].name << std::endl;
 
     DAGCircuit dag{graph};
+    std::cout << "qubit used: " << dag.get_qubits_used() << std::endl;
     dag.draw_self();
+
 
 }
 
 int main() {
     std::cout << "-- main function --" << std::endl;
 
-    // CouplingList c_list = get_default_clist();
+    CouplingList c_list = {
+        {6, 2, 3.14},
+        {1, 4, 5.67},
+        {6, 5, 7.89}
+    };
+    CouplingCircuit c_circuit{c_list};  
     // Backend backend(c_list);
     // Model model;
 
-    //SabreLayout sabreLayout;
-    //DAGCircuit dag;
-    test_dag();
-    // CouplingList c_list = {
-    //     {6, 2, 3.14},
-    //     {1, 4, 5.67},
-    //     {6, 5, 7.89}
-    // };
+    DAGCircuit dag;
+
+    std::cout << "-- SabreLayout --" << std::endl;
+    SabreLayout sabreLayout{c_circuit, dag};
+    //test_dag();
 
     // CouplingGraph c_graph{c_list};
 

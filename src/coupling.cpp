@@ -3,8 +3,8 @@
 #include <set>
 #include <algorithm>
 #include <iostream>
+#include <boost/graph/graph_utility.hpp>
 
-CouplingCircuit::CouplingCircuit() {}
 CouplingCircuit::CouplingCircuit(CouplingList c_list) : c_list(c_list) {
     //* Init sorted qubit vecter
     std::set<int> qubits_set;
@@ -13,7 +13,6 @@ CouplingCircuit::CouplingCircuit(CouplingList c_list) : c_list(c_list) {
         qubits_set.insert(std::get<1>(link));
     }
     std::copy(qubits_set.begin(), qubits_set.end(), std::back_inserter(_qubits_vec));
-
 
     //* add node&edge to graph
     for (int num : _qubits_vec) {
@@ -24,13 +23,7 @@ CouplingCircuit::CouplingCircuit(CouplingList c_list) : c_list(c_list) {
         CouplingEdge c_egde{std::get<2>(link)};
         boost::add_edge(std::get<0>(link), std::get<1>(link), c_egde, graph);
     } 
-    
 }
 
-
-unsigned int CouplingCircuit::get_num_qubits() { return _num_qubits; }
+int CouplingCircuit::get_num_qubits() { return _num_qubits; }
 void CouplingCircuit::draw_self() { draw_dot(graph_to_dot(graph)); }
-
-
-
-

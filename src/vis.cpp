@@ -32,7 +32,7 @@ public:
     template <typename EdgeDescriptor, typename OutputStream>
     void operator()(OutputStream& os, EdgeDescriptor e) const {
         const auto& edge = g[e];
-    os << "[label=\"" << "q" << edge.id << "\"]";
+    os << "[label=\"" << "q" << edge.qubit_id << "\"]";
     }
 };
 

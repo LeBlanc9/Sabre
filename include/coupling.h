@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <tuple>
+#include <memory>
 #include <boost/graph/adjacency_list.hpp>
 
 using CouplingList = std::vector<std::tuple<int, int, float>>;
@@ -22,15 +23,14 @@ public:
     CouplingList c_list = EMPTY_COUPLING_LIST;
     bool is_bidirectional = true;    
 
-    CouplingCircuit();
     CouplingCircuit(CouplingList c_list);
 
-    unsigned int get_num_qubits();
+    int get_num_qubits();
     void draw_self();
 
 
 
 private:
-    unsigned int _num_qubits = 0;
+    int _num_qubits = 0;
     std::vector<int> _qubits_vec = {};        
 };

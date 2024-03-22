@@ -1,8 +1,7 @@
 #pragma once
 #include <string>
-#include "dag_cuit.h"
+#include "dag.h"
 #include "coupling.h"
-
 
 std::string graph_to_dot(DagGraph& graph);
 std::string graph_to_dot(CouplingGraph& graph);

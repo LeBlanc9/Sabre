@@ -3,18 +3,19 @@
 #include "coupling.h"
 #include "model.h"
 #include "sabre_routing.h"
-#include "dag_cuit.h" 
+#include "dag.h" 
 
 class SabreLayout
 {
 public:
     Model model;
-    CouplingList coupling_list = EMPTY_COUPLING_LIST;
-    std::string heuristic="distance";
+    CouplingCircuit c_circuit;
+    DAGCircuit dag_circuit;
+    std::unique_ptr<SabreRouting> routing_ptr;
+    std::string heuristic = "distance";
     int max_iteration = 3; 
-    SabreRouting routing_pass;
 
-    SabreLayout();
+    SabreLayout(CouplingCircuit c_circuit, DAGCircuit dag_circuit);
 
     void set_model(Model model);
     Model get_model();

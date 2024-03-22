@@ -6,7 +6,7 @@
 #include "coupling.h"
 #include "sabre_layout.h"
 #include "sabre_routing.h"
-#include "dag_cuit.h"
+#include "dag.h"
 
 
 namespace py = pybind11;
@@ -14,11 +14,11 @@ namespace py = pybind11;
 PYBIND11_MODULE(sabre, m) {
     m.doc() = "For Sabre"; // optional module docstring
 
-    py::class_<SabreRouting>(m, "SabreRouting")
-        .def(py::init<Model>()) 
-        .def("set_model", &SabreRouting::set_model)
-        .def("get_model", &SabreRouting::get_model)
-        .def("run", &SabreRouting::run );
+    // py::class_<SabreRouting>(m, "SabreRouting")
+    //     .def(py::init<CouplingCircuit, DAGCircuit>()) 
+    //     .def("set_model", &SabreRouting::set_model)
+    //     .def("get_model", &SabreRouting::get_model)
+    //     .def("run", &SabreRouting::run );
 
 
     py::class_<Backend>(m, "Backend")
@@ -31,7 +31,6 @@ PYBIND11_MODULE(sabre, m) {
 
 
     py::class_<CouplingCircuit>(m, "CouplingCircuit")
-        .def(py::init<>())
         .def(py::init<CouplingList>())
         .def("get_num_qubits", &CouplingCircuit::get_num_qubits)
         .def("draw_self", &CouplingCircuit::draw_self);
@@ -47,7 +46,7 @@ PYBIND11_MODULE(sabre, m) {
     py::class_<EdgeProperties>(m, "EdgeProperties")
         .def(py::init<>())
         .def(py::init<int>())
-        .def_readwrite("id", &EdgeProperties::id);
+        .def_readwrite("id", &EdgeProperties::qubit_id);
 
     py::class_<DAGCircuit>(m, "DAGCircuit")
         .def(py::init<>())

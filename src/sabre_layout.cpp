@@ -1,10 +1,12 @@
 #include "sabre_layout.h"
-#include "dag_cuit.h"
+#include "sabre_routing.h"
+#include "dag.h"
 #include <iostream>
 
 
-SabreLayout::SabreLayout() {
+ SabreLayout::SabreLayout(CouplingCircuit c_circuit, DAGCircuit dag_circuit) : c_circuit(c_circuit), dag_circuit(dag_circuit) {
     std::cout << "SabreLayout Created" << std::endl;
+    this->routing_ptr = std::make_unique<SabreRouting>(c_circuit, dag_circuit);
 }
 
 void SabreLayout::set_model(Model model) {
@@ -24,5 +26,5 @@ void SabreLayout::run(DAGCircuit& dag) {
 }
 
 void SabreLayout::run_single(DAGCircuit& dag) {
-    this->routing_pass.run(dag);
+    (*routing_ptr).run(dag);
 }

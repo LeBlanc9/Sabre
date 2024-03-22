@@ -21,11 +21,11 @@ struct InstructionNode {
 
 struct EdgeProperties {
 public:
-    int id; // 1,2,3 for qubits 
+    int qubit_id; // 1,2,3 for qubits 
     std::string name = "NoName";
 
     EdgeProperties();
-    EdgeProperties(int id);
+    EdgeProperties(int qubit_id);
 };
 
 using DagGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
@@ -43,7 +43,8 @@ public:
     
     void add_node(InstructionNode node);
     void add_edge(int from, int to, EdgeProperties ep);
-    int get_num_nodes(); 
+    int get_num_nodes();    // return num of gates.
+    int get_qubits_used();
 
     void draw_self();
 };
