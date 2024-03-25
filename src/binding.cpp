@@ -14,17 +14,19 @@ namespace py = pybind11;
 PYBIND11_MODULE(sabre, m) {
     m.doc() = "For Sabre"; // optional module docstring
 
-    // py::class_<SabreRouting>(m, "SabreRouting")
-    //     .def(py::init<CouplingCircuit, DAGCircuit>()) 
-    //     .def("set_model", &SabreRouting::set_model)
-    //     .def("get_model", &SabreRouting::get_model)
-    //     .def("run", &SabreRouting::run );
+    py::class_<SabreLayout>(m, "SabreLayout")
+        .def(py::init<const CouplingCircuit&>()) 
+        .def("run", &SabreLayout::run );
 
+     py::class_<SabreRouting>(m, "SabreRouting")
+        .def(py::init<const CouplingCircuit&>()) 
+        .def("set_model", &SabreRouting::set_model)
+        .def("get_model", &SabreRouting::get_model)
+        .def("run", &SabreRouting::run );       
 
     py::class_<Backend>(m, "Backend")
         .def(py::init<CouplingList>())
         .def(py::init<>());
-        
 
     py::class_<Model>(m, "Model")
         .def(py::init<Backend>());
@@ -33,7 +35,8 @@ PYBIND11_MODULE(sabre, m) {
     py::class_<CouplingCircuit>(m, "CouplingCircuit")
         .def(py::init<CouplingList>())
         .def("update_num_qubits", &CouplingCircuit::update_num_qubits)
-        .def("draw_self", &CouplingCircuit::draw_self);
+        .def("draw_self", &CouplingCircuit::draw_self)
+        .def("print_self", &CouplingCircuit::print_self);
 
 
     py::class_<InstructionNode>(m, "InstructionNode")
@@ -54,6 +57,7 @@ PYBIND11_MODULE(sabre, m) {
         .def("add_edge", &DAGCircuit::add_edge)
         .def("get_num_nodes", &DAGCircuit::get_num_nodes)
         .def("draw_self", &DAGCircuit::draw_self)
+        .def("print_self", &DAGCircuit::print_self)
         .def_readwrite("graph", &DAGCircuit::graph);
 
     //m.def("draw_graph", &draw_graph, "Draw a Graph object");

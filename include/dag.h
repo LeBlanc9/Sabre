@@ -17,13 +17,12 @@ struct InstructionNode {
 
     InstructionNode();
     InstructionNode(const std::string& name);
-    InstructionNode(const std::string& operation, std::vector<int> pos);
+    InstructionNode(const std::string& name, std::vector<int> pos);
 };
 
 struct EdgeProperties {
 public:
     int qubit_id; // 1,2,3 for qubits 
-    std::string name = "NoName";
 
     EdgeProperties();
     EdgeProperties(int qubit_id);
@@ -42,10 +41,11 @@ public:
     
     void add_node(InstructionNode node);
     void add_edge(int from, int to, EdgeProperties ep);
-    int get_num_nodes();    // return num of gates.
-    int get_qubits_used();
+    int get_num_nodes() const;    // return num of gates.
+    int get_qubits_used() const;
 
-    void draw_self();
+    void draw_self() const;
+    void print_self() const;
 };
 
 DagGraph reverse_DagGraph(const DagGraph& graph);

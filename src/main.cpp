@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <graphviz/gvc.h>
 
-void test_dag() {
+DAGCircuit test_dag() {
     InstructionNode node1{"a"};
     InstructionNode node2{"b"};
     InstructionNode node3{"c"};
@@ -33,8 +33,9 @@ void test_dag() {
     //std::cout << graph[2].name << std::endl;
 
     DAGCircuit dag_circuit{graph};
-    std::cout << "qubit used: " << dag_circuit.get_qubits_used() << std::endl;
-    dag_circuit.draw_self();
+    std::cout << "dag_circuit qubit used: " << dag_circuit.get_qubits_used() << std::endl;
+    print_graph(dag_circuit.graph);
+    //dag_circuit.draw_self();
     //boost::print_graph(dag);
 
     DagGraph rev_graph = reverse_DagGraph(dag_circuit.graph);
@@ -42,14 +43,16 @@ void test_dag() {
     //rev.draw_self();
     //draw_graph(rev_graph);
 
+    return dag_circuit;
 }
 
-void test_c_ciruit() {
+CouplingCircuit test_c_ciruit() {
     CouplingList c_list = {
         {0, 1, 0.99},
         {2, 3, 0.67},
         {2, 4, 0.89},
-        {5, 4, 0.89},
+        {1, 4, 0.89},
+        {3, 4, 0.89},
     };
     CouplingCircuit c_circuit{c_list};  
 
@@ -58,15 +61,26 @@ void test_c_ciruit() {
     auto v2 = boost::add_vertex(CouplingNode{10}, graph);
 
 
-    std::cout << "cc num of qubits: " <<  c_circuit.num_qubits << std::endl;
+    std::cout << "c_circuit num of qubits: " <<  c_circuit.num_qubits << std::endl;
     print_graph(c_circuit.graph);
 
-    c_circuit.draw_self();
-
+    //c_circuit.draw_self();
+    return c_circuit;
 }
 
+void test_sabre_routing() {
+    CouplingCircuit c_circuit = test_c_ciruit();
+    DAGCircuit dag = test_dag();
+
+    c_circuit.draw_self();
+    SabreRouting sabre_routing{c_circuit};
+    sabre_routing.run(dag);
+}
+
+
 int main() {
-    std::cout << "-- main function --" << std::endl;
+    std::cout << "---- main function ----" << std::endl;
     // test_c_ciruit();
-    test_dag();
+    // test_dag();
+    test_sabre_routing();
 }

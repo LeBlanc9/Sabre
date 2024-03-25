@@ -27,8 +27,8 @@ public:
 
     CouplingCircuit(CouplingList c_list);
     void update_num_qubits();
-    void draw_self();
-
+    void draw_self() const;
+    void print_self() const;
 
 private:
 };

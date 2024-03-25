@@ -8,16 +8,16 @@
 class SabreLayout
 {
 public:
-    CouplingCircuit c_circuit;
+    const CouplingCircuit& c_circuit;
     std::shared_ptr<Model> model_ptr;
     std::unique_ptr<SabreRouting> routing_ptr;
     std::string heuristic = "distance";
     int max_iteration = 3; 
 
-    SabreLayout(CouplingCircuit c_circuit);
+    SabreLayout(const CouplingCircuit& c_circuit);
 
     void set_model(const Model& model);
-    Model get_model();
-    DAGCircuit run(DAGCircuit& dag);
-    DAGCircuit run_single(DAGCircuit& dag);
+    Model get_model() const;
+    DAGCircuit run(const DAGCircuit& dag);
+    DAGCircuit run_single(const DAGCircuit& dag);
 };
