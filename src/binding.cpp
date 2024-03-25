@@ -32,7 +32,7 @@ PYBIND11_MODULE(sabre, m) {
 
     py::class_<CouplingCircuit>(m, "CouplingCircuit")
         .def(py::init<CouplingList>())
-        .def("get_num_qubits", &CouplingCircuit::get_num_qubits)
+        .def("update_num_qubits", &CouplingCircuit::update_num_qubits)
         .def("draw_self", &CouplingCircuit::draw_self);
 
 

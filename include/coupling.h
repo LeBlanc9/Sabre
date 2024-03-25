@@ -16,21 +16,19 @@ struct CouplingEdge{
 
 using CouplingGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, CouplingNode, CouplingEdge>;
 
+
 class CouplingCircuit
 {
 public:     
     CouplingGraph graph;
-    CouplingList c_list = EMPTY_COUPLING_LIST;
+    CouplingList c_list;
     bool is_bidirectional = true;    
+    unsigned int num_qubits = 0;
 
     CouplingCircuit(CouplingList c_list);
-
-    int get_num_qubits();
+    void update_num_qubits();
     void draw_self();
 
 
-
 private:
-    int _num_qubits = 0;
-    std::vector<int> _qubits_vec = {};        
 };

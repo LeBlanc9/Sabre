@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include <memory>
 #include <model.h>
 #include "dag.h"
 #include "coupling.h"
@@ -8,9 +7,8 @@
 class SabreRouting
 {
 private:
-    Model model;
     CouplingCircuit& c_circuit;
-    DAGCircuit& dag_circuit;
+    std::shared_ptr<Model> model_ptr;
     std::string heuristic = "distance";
     bool modify_dag = false;
     float decay_delta = 0.001;
@@ -20,8 +18,8 @@ private:
     
 
 public:
-    SabreRouting(CouplingCircuit& c_circuit, DAGCircuit& dag_circiut);
-    void set_model(Model model);
+    SabreRouting(CouplingCircuit& c_circuit);
+    void set_model(std::shared_ptr<Model> model_ptr);
     Model get_model();
-    int run(DAGCircuit& dag); 
+    DAGCircuit run(DAGCircuit& dag); 
 };

@@ -61,21 +61,21 @@ public:
     }
 };
 
-std::string graph_to_dot(DagGraph& graph) {
+std::string graph_to_dot(const DagGraph& graph) {
     std::ostringstream os;
     boost::write_graphviz(os, graph, DagNodeWriter(graph), DagEdgeWriter(graph));
     return os.str();
 }
 
-std::string graph_to_dot(CouplingGraph& graph) {
+std::string graph_to_dot(const CouplingGraph& graph) {
     std::ostringstream os;
     boost::write_graphviz(os, graph, CouplingNodeWriter(graph), CouplingEdgeWriter(graph));
     return os.str();
 }
 
 
-void draw_dot(std::string dot_str) {
-    std::cout << "-- drawing" << std::endl;
+void draw_dot(const std::string dot_str) {
+    std::cout << "-- drawing --" << std::endl;
 
     // save .dot file
     std::ofstream dot_file("output.dot");

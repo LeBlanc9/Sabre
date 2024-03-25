@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/labeled_graph.hpp>
 #include <boost/graph/graphviz.hpp>
 #include <graphviz/gvc.h>
 
@@ -28,9 +29,7 @@ public:
     EdgeProperties(int qubit_id);
 };
 
-using DagGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
-                                    InstructionNode,
-                                    EdgeProperties>;
+using DagGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, InstructionNode, EdgeProperties, boost::bidirectionalS>;
 
 
 class DAGCircuit {
@@ -49,4 +48,4 @@ public:
     void draw_self();
 };
 
-DagGraph reverse_dag(DagGraph& graph);
+DagGraph reverse_DagGraph(const DagGraph& graph);

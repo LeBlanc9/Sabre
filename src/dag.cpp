@@ -1,6 +1,8 @@
 #include <set>
 #include "dag.h"
 #include "vis.h"
+#include <boost/graph/reverse_graph.hpp>
+#include <boost/graph/copy.hpp>
 
 
 //* Struct InstructionNode
@@ -16,7 +18,7 @@ EdgeProperties::EdgeProperties(int qubit_id) : qubit_id(qubit_id) {}
 //* Class DAGCircuit
 DAGCircuit::DAGCircuit() {}
 DAGCircuit::DAGCircuit(DagGraph& graph) : graph(graph) {}
-void DAGCircuit::add_node(InstructionNode node) { boost::add_vertex(node, graph);}
+void DAGCircuit::add_node(InstructionNode node) { boost::add_vertex(node.name, graph);}
 void DAGCircuit::add_edge(int from, int to, EdgeProperties ep) { boost::add_edge(from, to, ep, graph); }
 int  DAGCircuit::get_num_nodes() { return boost::num_vertices(graph); }
 int  DAGCircuit::get_qubits_used() {
@@ -34,8 +36,10 @@ void DAGCircuit::draw_self() { draw_dot(graph_to_dot(graph)); }
 
 
 //* Utils Function
-DagGraph reverse_dag(DagGraph& graph) {
+DagGraph reverse_DagGraph(const DagGraph& graph) {
     DagGraph rev_graph;
-    // TODO:
+    boost::copy_graph(boost::make_reverse_graph(graph), rev_graph);
     return rev_graph;
 }
+
+void draw_dagGraph(const DagGraph& graph) { draw_dot(graph_to_dot(graph)); }
