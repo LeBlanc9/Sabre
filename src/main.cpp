@@ -82,5 +82,14 @@ int main() {
     std::cout << "---- main function ----" << std::endl;
     // test_c_ciruit();
     // test_dag();
-    test_sabre_routing();
+    // test_sabre_routing();
+
+    std::vector<int> front_layer = {1,2,3,4,1,3,4,1,3};
+    front_layer.erase(std::remove(front_layer.begin(), front_layer.end(), 1), front_layer.end());
+
+    for (auto it=front_layer.begin(); it!=front_layer.end(); ++it) 
+    {
+        std::cout << *it << std::endl;
+    }
+
 }

@@ -3,9 +3,11 @@
 #include <sstream>
 #include <vector>
 
-std::string vectorToString(const std::vector<int>& vec) {
+std::string vectorToString(const std::vector<int>& vec) 
+{
     std::ostringstream ss;
-    for (size_t i = 0; i < vec.size(); ++i) {
+    for (size_t i = 0; i < vec.size(); ++i) 
+    {
         if (i > 0)  ss << ",";
         ss << vec[i]; 
     }
@@ -18,9 +20,13 @@ public:
     DagNodeWriter(DagGraph g) : g(g) {}
 
     template <typename VertexDescriptor, typename OutputStream>
-    void operator()(OutputStream& os, VertexDescriptor v) const {
+    void operator()(OutputStream& os, VertexDescriptor v) const 
+    {
         const auto& node = g[v];
-        os << "[label=\"" << "{" << node.name << "("<< vectorToString(node.qubit_pos) << ")" << "}" << "\"]";
+        os << "[label=\"" << v;
+        os << "{" << node.name; 
+        os << "("<< vectorToString(node.qubit_pos);
+        os << ")" << "}" << "\"]";
     }
 };
 
@@ -30,9 +36,10 @@ public:
     DagEdgeWriter(DagGraph g) : g(g) {}
 
     template <typename EdgeDescriptor, typename OutputStream>
-    void operator()(OutputStream& os, EdgeDescriptor e) const {
+    void operator()(OutputStream& os, EdgeDescriptor e) const 
+    {
         const auto& edge = g[e];
-    os << "[label=\"" << "q" << edge.qubit_id << "\"]";
+        os << "[label=\"" << "q" << edge.qubit_id << "\"]";
     }
 };
 
@@ -43,7 +50,8 @@ public:
     CouplingNodeWriter(CouplingGraph g) : g(g) {}
 
     template <typename VertexDescriptor, typename OutputStream>
-    void operator()(OutputStream& os, VertexDescriptor v) const {
+    void operator()(OutputStream& os, VertexDescriptor v) const 
+    {
         const auto& node = g[v];
         os << "[label=\"" << node.id << "\"]";
     }
@@ -55,26 +63,30 @@ public:
     CouplingEdgeWriter(CouplingGraph g) : g(g) {}
 
     template <typename EdgeDescriptor, typename OutputStream>
-    void operator()(OutputStream& os, EdgeDescriptor e) const {
+    void operator()(OutputStream& os, EdgeDescriptor e) const 
+    {
         const auto& edge = g[e];
         os << "[label=\"" << edge.fidelity << "\"]";
     }
 };
 
-std::string graph_to_dot(const DagGraph& graph) {
+std::string graph_to_dot(const DagGraph& graph) 
+{
     std::ostringstream os;
     boost::write_graphviz(os, graph, DagNodeWriter(graph), DagEdgeWriter(graph));
     return os.str();
 }
 
-std::string graph_to_dot(const CouplingGraph& graph) {
+std::string graph_to_dot(const CouplingGraph& graph) 
+{
     std::ostringstream os;
     boost::write_graphviz(os, graph, CouplingNodeWriter(graph), CouplingEdgeWriter(graph));
     return os.str();
 }
 
 
-void draw_dot(const std::string dot_str) {
+void draw_dot(const std::string dot_str) 
+{
     std::cout << "-- drawing --" << std::endl;
 
     // save .dot file

@@ -20,7 +20,7 @@ def dag_to_cppDag(dag: DAGCircuit) -> Cpp_DAGCircuit:
 
     # Add node
     for index, node in enumerate(dag.nodes(data=True)):
-        #print(f"index:{index}, node:{node}") 
+        # print(f"index:{index}, node:{node}") 
         cpp_node = node_to_cppNode(node[0])
         cppDag.add_node(cpp_node)
 

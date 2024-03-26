@@ -18,6 +18,8 @@ struct InstructionNode {
     InstructionNode();
     InstructionNode(const std::string& name);
     InstructionNode(const std::string& name, std::vector<int> pos);
+
+    friend std::ostream& operator<< (std::ostream& os, const InstructionNode& node);
 };
 
 struct EdgeProperties {

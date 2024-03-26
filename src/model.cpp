@@ -10,6 +10,6 @@ Model::Model(Backend backend) : _backend(backend) {
     std::cout << "Model with backend created" << std::endl;
 }
 
-Backend  Model::get_backend() {
+Backend  Model::get_backend() const {
     return _backend;
 }

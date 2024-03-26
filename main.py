@@ -1,4 +1,6 @@
-from build.sabre import Backend, Model, CouplingCircuit
+from build.sabre import CouplingCircuit
+from build.sabre import Backend as Backend_cpp
+from build.sabre import Model as Model_cpp
 from build.sabre import SabreLayout as SabreLayout_cpp 
 from build.sabre import SabreRouting as SabreRouting_cpp
 from build.sabre import DAGCircuit as DAGCircuit_cpp
@@ -6,23 +8,52 @@ from build.sabre import CouplingCircuit as CouplingCircuit_cpp
 from build.sabre import InstructionNode as InstructionNode_cpp
 
 import numpy as np
+import time
 
 import sys
 sys.path.append("/Users/air/workspace/qusteed")
 from qusteed.dag.dag_circuit import DAGCircuit
+from qusteed.passes.mapping.routing.sabre_routing import SabreRouting
+from qusteed.passes.model import Model
+from qusteed.backends.backend import Backend
+from qusteed.passes.datadict import DataDict
 from qusteed.dag.circuit_dag  import circuit_to_dag, dag_to_circuit, draw_dag
 from qusteed.dag.instruction_node import InstructionNode 
+from qusteed.graph.couplinggraph import CouplingGraph
+from qusteed.utils.random_circuit import RandomCircuit 
 from quafu import QuantumCircuit
 
 from utils import *
 
+def get_preset_model():
+    c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9), (4,3,0.9), (5,4, 0.99), (4,5,0.99)]
+    dataDict = DataDict()
+    dataDict['coupling_list'] = c_list
+    backend_properties = {
+        'name': 'ExampleBackend',
+        'backend_type': 'superconducting',
+        'qubits_num': 4,
+        'coupling_list': c_list,
+    }
+    backend_instance = Backend(**backend_properties)
+    model = Model(backend=backend_instance, datadict=dataDict)
+    return model
+
+def get_random_qc():
+    rqc = RandomCircuit(num_qubit=6, gates_number=1000, gates_list=['cx', 'rxx', 'rzz'])
+    qc = rqc.random_circuit()
+    qc.measure([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])
+    #qc.plot_circuit()
+    #plt.show()
+
+    return qc
 
 def test_coupling():
-    c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9),(4,3,0.9)]
+    c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9), (4,3,0.9), (5,4, 0.99), (4,5,0.99)]
     c_circuit = CouplingCircuit_cpp(c_list)
     # c_circuit.draw_self()
-    # backend = Backend(c_list)
-    # model = Model(backend)
+    backend = Backend_cpp(c_list)
+    model = Model_cpp(backend)
 
     return c_circuit
 
@@ -47,17 +78,36 @@ def test_dag():
     cpp_dag = dag_to_cppDag(dag)
     # cpp_dag.draw_self()
 
-    return cpp_dag; 
+    return dag, cpp_dag; 
 
 
 if __name__ == "__main__":
-    dag = test_dag()
-    print("--- DAG ---")
-    dag.print_self()
-    dag.draw_self()
+    # dag, cpp_dag = test_dag()
+    # print("--- DAG ---")
+    # cpp_dag.print_self()
     c_circuit = test_coupling()
-    print("--- Coupling ---")
-    c_circuit.print_self() 
+    model = get_preset_model()
 
-    sabre_routing = SabreRouting_cpp(c_circuit)
+    qc = get_random_qc()
+    dag = circuit_to_dag(qc)
+    dag_cpp = dag_to_cppDag(dag)
+    #dag_cpp.draw_self()
+
+    # print("--- Coupling ---")
+    # c_circuit.print_self() 
+
+    
+    sabre_routing = SabreRouting()
+    sabre_routing.set_model(model)
+    print("---- python ----")
+    st = time.time()
     sabre_routing.run(dag)
+    print(f"python-time: {time.time()-st}")
+    #draw_dag(dag)
+
+    sabre_routing_cpp = SabreRouting_cpp(c_circuit)
+    print("----  c++   ----")
+    st = time.time()
+    sabre_routing_cpp.run(dag_cpp)
+    print(f"cpp-time: {time.time()-st}")
+
