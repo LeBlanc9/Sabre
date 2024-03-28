@@ -4,7 +4,7 @@
 
 
 Backend::Backend() : c_list({std::make_tuple(0, 0, 0)}) {
-   std::cout << "Empty Backend Created" << std::endl;
+   // std::cout << "Empty Backend Created" << std::endl;
 }
 
 Backend::Backend(CouplingList c_list) : c_list(c_list) {

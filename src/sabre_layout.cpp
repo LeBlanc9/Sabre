@@ -5,31 +5,28 @@
 #include <iostream>
 
 
-SabreLayout::SabreLayout(const CouplingCircuit& c_circuit) : c_circuit(c_circuit) {
+SabreLayout::SabreLayout(const CouplingCircuit& c_circuit) : c_circuit(c_circuit) 
+{
     std::cout << "SabreLayout Created" << std::endl;
     // init routing_ptr
     this->routing_ptr = std::make_unique<SabreRouting>(c_circuit);
-    this->routing_ptr->set_model(this->model_ptr);
+    // this->routing_ptr->set_model(get_model());
 }
 
-void SabreLayout::set_model(const Model& model) {
-    this->model_ptr = std::make_shared<Model>(model);
-} 
+void SabreLayout::set_model(const Model& model) { this->model_ptr = std::make_shared<Model>(model); } 
+Model SabreLayout::get_model() const { return *(this->model_ptr); }
 
-Model SabreLayout::get_model() const {
-    return *(this->model_ptr); 
-}
 
-DAGCircuit SabreLayout::run(const DAGCircuit& dag) {
+DAGCircuit SabreLayout::run(const DAGCircuit& dag) 
+{
     std::cout << "Run sabre layout !" << std::endl;
-
     //* Precheck
-    int qubits_used = dag.get_qubits_used();
-    if (qubits_used == 1) { 
+    std::set<int> qubits_used = dag.get_qubits_used();
+    if (qubits_used.size() == 1) { 
         std::cerr << "Warning: single qubit circuit no need optimize." << std::endl;
         return dag; 
     }
-    if (qubits_used > this->c_circuit.num_qubits) 
+    if (qubits_used.size() > this->c_circuit.num_qubits) 
         throw std::runtime_error("More virtual qubits than physical qubits.");
 
     //* Presetting
@@ -44,7 +41,6 @@ DAGCircuit SabreLayout::run(const DAGCircuit& dag) {
             // const DAGCircuit& selected_dag = direction == 0 ? dag : rev_dag;
             // this->run_single(selected_dag);
             this->run_single(direction == 0 ? dag : rev_dag);
-
         }
     }
 
@@ -55,7 +51,9 @@ DAGCircuit SabreLayout::run(const DAGCircuit& dag) {
     return dag;
 }
 
-DAGCircuit SabreLayout::run_single(const DAGCircuit& dag) {
+
+DAGCircuit SabreLayout::run_single(const DAGCircuit& dag) 
+{
     DAGCircuit new_dag = this->routing_ptr->run(dag);
     return new_dag;
 }

@@ -1,10 +1,9 @@
 #include "layout.h"
 
-std::unordered_map<int, int> generate_random_layout(int virtual_qubits, int physical_qubits) {
-
-    if (virtual_qubits > physical_qubits) {
+std::unordered_map<int, int> generate_random_layout(int virtual_qubits, int physical_qubits) 
+{
+    if (virtual_qubits > physical_qubits) 
         throw std::invalid_argument("Error: The number of virtual qubits in the circuit cannot be greater than the number of physical qubits in the chip.");
-    }
 
     // Generate a ordered sequence of virtual qubits
     std::vector<int> virtual_qubit(virtual_qubits);
@@ -18,9 +17,22 @@ std::unordered_map<int, int> generate_random_layout(int virtual_qubits, int phys
 
     // 创建一个从虚拟量子比特到物理量子比特的映射
     std::unordered_map<int, int> v2p;
-    for (int i = 0; i < virtual_qubits; ++i) {
+    for (int i = 0; i < virtual_qubits; ++i)
         v2p[virtual_qubit[i]] = physical_qubit[i];
-    }
 
     return v2p;
+}
+
+
+
+void print_layout(const Layout& layout) 
+{
+    std::cout << "{";
+    for (auto it = layout.begin(); it != layout.end(); ++it) 
+    {
+        std::cout << it->first << ": " << it->second;
+        if (std::next(it) != layout.end())
+            std::cout << ", ";
+    }
+    std::cout << "}" << std::endl;
 }

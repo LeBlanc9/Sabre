@@ -40,7 +40,8 @@ def get_preset_model():
     return model
 
 def get_random_qc():
-    rqc = RandomCircuit(num_qubit=6, gates_number=1000, gates_list=['cx', 'rxx', 'rzz'])
+    gate_list = ['cx', 'rxx', 'rzz', 'rx', 'id', 'h']
+    rqc = RandomCircuit(num_qubit=6, gates_number=10, gates_list=gate_list)
     qc = rqc.random_circuit()
     qc.measure([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])
     #qc.plot_circuit()
@@ -57,7 +58,7 @@ def test_coupling():
 
     return c_circuit
 
-def test_dag(): 
+def test_dag():
     simple = QuantumCircuit(3)
     simple.cnot(0, 1)
     simple.cnot(1, 0)
@@ -82,19 +83,19 @@ def test_dag():
 
 
 if __name__ == "__main__":
-    # dag, cpp_dag = test_dag()
-    # print("--- DAG ---")
-    # cpp_dag.print_self()
+
+
+
     c_circuit = test_coupling()
     model = get_preset_model()
+    
 
     qc = get_random_qc()
     dag = circuit_to_dag(qc)
     dag_cpp = dag_to_cppDag(dag)
     #dag_cpp.draw_self()
 
-    # print("--- Coupling ---")
-    # c_circuit.print_self() 
+
 
     
     sabre_routing = SabreRouting()
@@ -103,11 +104,17 @@ if __name__ == "__main__":
     st = time.time()
     sabre_routing.run(dag)
     print(f"python-time: {time.time()-st}")
-    #draw_dag(dag)
+    draw_dag(dag)
+
+
+    model_cpp = Model_cpp() 
+    print(sabre_routing.model._layout["initial_layout"].v2p)
+    model_cpp.init_layout = sabre_routing.model._layout["initial_layout"].v2p
 
     sabre_routing_cpp = SabreRouting_cpp(c_circuit)
+    sabre_routing_cpp.set_model(model_cpp)
+
     print("----  c++   ----")
     st = time.time()
     sabre_routing_cpp.run(dag_cpp)
     print(f"cpp-time: {time.time()-st}")
-

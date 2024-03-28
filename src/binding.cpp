@@ -29,7 +29,9 @@ PYBIND11_MODULE(sabre, m) {
         .def(py::init<>());
 
     py::class_<Model>(m, "Model")
-        .def(py::init<Backend>());
+        .def(py::init<>())
+        .def(py::init<Backend>())
+        .def_readwrite("init_layout", &Model::init_layout);
 
 
     py::class_<CouplingCircuit>(m, "CouplingCircuit")

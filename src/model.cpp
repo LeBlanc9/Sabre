@@ -3,7 +3,7 @@
 
 
 Model::Model() {
-    std::cout << "Empty model created" << std::endl;
+    // std::cout << "Empty model created" << std::endl;
 }
 
 Model::Model(Backend backend) : _backend(backend) {

@@ -3,6 +3,7 @@
 #include "dag.h"
 #include "coupling.h"
 #include "vis.h"
+#include "layout.h"
 
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/graph_utility.hpp>
@@ -33,7 +34,7 @@ DAGCircuit test_dag() {
     //std::cout << graph[2].name << std::endl;
 
     DAGCircuit dag_circuit{graph};
-    std::cout << "dag_circuit qubit used: " << dag_circuit.get_qubits_used() << std::endl;
+    std::cout << "dag_circuit qubit used: " << dag_circuit.get_qubits_used().size() << std::endl;
     print_graph(dag_circuit.graph);
     //dag_circuit.draw_self();
     //boost::print_graph(dag);
@@ -83,13 +84,9 @@ int main() {
     // test_c_ciruit();
     // test_dag();
     // test_sabre_routing();
-
-    std::vector<int> front_layer = {1,2,3,4,1,3,4,1,3};
-    front_layer.erase(std::remove(front_layer.begin(), front_layer.end(), 1), front_layer.end());
-
-    for (auto it=front_layer.begin(); it!=front_layer.end(); ++it) 
-    {
-        std::cout << *it << std::endl;
+    Layout init_layout;
+    if (init_layout.empty()) {
+        std::cout << "init_layout is empty" << std::endl;
     }
 
 }

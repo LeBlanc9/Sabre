@@ -34,7 +34,6 @@ using DagGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directed
 
 
 class DAGCircuit {
-
 public:
     DagGraph graph;
 
@@ -44,10 +43,25 @@ public:
     void add_node(InstructionNode node);
     void add_edge(int from, int to, EdgeProperties ep);
     int get_num_nodes() const;    // return num of gates.
-    int get_qubits_used() const;
+    inline std::set<int> get_qubits_used() const;
+    
 
     void draw_self() const;
     void print_self() const;
 };
+
+inline std::set<int> DAGCircuit::get_qubits_used() const
+{
+    std::set<int> qubits_id_set;      
+    DagGraph::edge_iterator ei, ei_end;
+    for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei)
+        qubits_id_set.insert(graph[*ei].qubit_id);
+
+    return qubits_id_set;
+}
+
+
+
+
 
 DagGraph reverse_DagGraph(const DagGraph& graph);

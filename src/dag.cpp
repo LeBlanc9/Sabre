@@ -31,16 +31,7 @@ DAGCircuit::DAGCircuit(DagGraph& graph) : graph(graph) {}
 void DAGCircuit::add_node(InstructionNode node) { boost::add_vertex(node, graph);}
 void DAGCircuit::add_edge(int from, int to, EdgeProperties ep) { boost::add_edge(from, to, ep, graph); }
 int  DAGCircuit::get_num_nodes() const { return boost::num_vertices(graph); }
-int  DAGCircuit::get_qubits_used() const {
-    int qubits_used = 0;
-    // 遍历所有边
-    std::set<int> qubits_id_set;      
-    DagGraph::edge_iterator ei, ei_end;
-    for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei)
-        qubits_id_set.insert(graph[*ei].qubit_id);
 
-    return qubits_id_set.size();
-}
 
 void DAGCircuit::draw_self() const { draw_dot(graph_to_dot(graph)); }
 void DAGCircuit::print_self() const { print_graph(graph); }
