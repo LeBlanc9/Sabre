@@ -5,6 +5,8 @@
 #include "coupling.h"
 #include "layout.h"
 
+using SwapPos = std::pair<int, int>;
+
 class SabreRouting
 {
 public:
@@ -32,7 +34,14 @@ private:
     inline std::vector<int> _dag_successors(const DAGCircuit& dag, int node_index) const;
     
     inline void _reset_qubits_decay();
-   
+
+    std::set<int> _calc_extended_set(const DAGCircuit& dag, const std::vector<int>& front_layer);
+
+    std::set<SwapPos> _obtain_swaps(const std::vector<int>& front_layer, const Layout& current_layout, const DAGCircuit& dag);
+
+    // def _get_best_swap(self, swap_candidates, current_layout, front_layer, extended_set, unavailable_2qubits):
+    void _get_best_swap(const std::set<SwapPos>& swap_candidates, const Layout& current_layout, const std::vector<int>& front_layer, const std::set<int>& extended_set, const std::set<std::pair<int, int>>& unavailable_2qubits) const;
+
 };
 
 

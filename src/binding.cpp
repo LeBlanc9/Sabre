@@ -7,6 +7,7 @@
 #include "sabre_layout.h"
 #include "sabre_routing.h"
 #include "dag.h"
+#include "layout.h"
 
 
 namespace py = pybind11;
@@ -40,6 +41,10 @@ PYBIND11_MODULE(sabre, m) {
         .def("draw_self", &CouplingCircuit::draw_self)
         .def("print_self", &CouplingCircuit::print_self);
 
+    py::class_<Layout>(m, "Layout")
+        .def(py::init<>())
+        .def(py::init<LayoutStructure>())
+        .def("__getitem__", &Layout::operator[]);
 
     py::class_<InstructionNode>(m, "InstructionNode")
         .def(py::init<>())

@@ -43,7 +43,7 @@ DAGCircuit SabreLayout::run(const DAGCircuit& dag)
             this->run_single(direction == 0 ? dag : rev_dag);
         }
     }
-
+    // TODO:
     // The last forward iteration obtains the final circuit. 
     this->routing_ptr->modify_dag = true;
     DAGCircuit physical_dag = this->run_single(dag);

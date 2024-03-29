@@ -6,6 +6,7 @@ from build.sabre import SabreRouting as SabreRouting_cpp
 from build.sabre import DAGCircuit as DAGCircuit_cpp
 from build.sabre import CouplingCircuit as CouplingCircuit_cpp
 from build.sabre import InstructionNode as InstructionNode_cpp
+from build.sabre import Layout as Layout_cpp
 
 import numpy as np
 import time
@@ -43,7 +44,7 @@ def get_random_qc():
     gate_list = ['cx', 'rxx', 'rzz', 'rx', 'id', 'h']
     rqc = RandomCircuit(num_qubit=6, gates_number=10, gates_list=gate_list)
     qc = rqc.random_circuit()
-    qc.measure([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])
+    # qc.measure([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])
     #qc.plot_circuit()
     #plt.show()
 
@@ -93,23 +94,24 @@ if __name__ == "__main__":
     qc = get_random_qc()
     dag = circuit_to_dag(qc)
     dag_cpp = dag_to_cppDag(dag)
-    #dag_cpp.draw_self()
+    dag_cpp.draw_self()
 
 
 
     
     sabre_routing = SabreRouting()
     sabre_routing.set_model(model)
+
     print("---- python ----")
     st = time.time()
     sabre_routing.run(dag)
     print(f"python-time: {time.time()-st}")
-    draw_dag(dag)
 
 
     model_cpp = Model_cpp() 
     print(sabre_routing.model._layout["initial_layout"].v2p)
-    model_cpp.init_layout = sabre_routing.model._layout["initial_layout"].v2p
+    model_cpp.init_layout =  Layout_cpp(sabre_routing.model._layout["initial_layout"].v2p)
+    
 
     sabre_routing_cpp = SabreRouting_cpp(c_circuit)
     sabre_routing_cpp.set_model(model_cpp)

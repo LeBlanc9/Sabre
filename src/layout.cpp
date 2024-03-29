@@ -1,6 +1,6 @@
 #include "layout.h"
 
-std::unordered_map<int, int> generate_random_layout(int virtual_qubits, int physical_qubits) 
+Layout generate_random_layout(int virtual_qubits, int physical_qubits) 
 {
     if (virtual_qubits > physical_qubits) 
         throw std::invalid_argument("Error: The number of virtual qubits in the circuit cannot be greater than the number of physical qubits in the chip.");
@@ -20,12 +20,12 @@ std::unordered_map<int, int> generate_random_layout(int virtual_qubits, int phys
     for (int i = 0; i < virtual_qubits; ++i)
         v2p[virtual_qubit[i]] = physical_qubit[i];
 
-    return v2p;
+    return Layout{v2p};
 }
 
 
 
-void print_layout(const Layout& layout) 
+void print_layout(const LayoutStructure& layout) 
 {
     std::cout << "{";
     for (auto it = layout.begin(); it != layout.end(); ++it) 

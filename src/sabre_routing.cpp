@@ -46,15 +46,16 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
     DAGCircuit mapped_dag;
 
     Layout current_layout;
-    if (model_ptr->init_layout.empty()) {
+    if (model_ptr->init_layout.empty())
+    {
         model_ptr->init_layout = generate_random_layout(qubits_used.size(), c_circuit.num_qubits);
     }
+
     current_layout = model_ptr->init_layout;
     // for (const auto& pair : current_layout) {
     //         std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
     // }
-    print_layout(current_layout);
-
+    print_layout(current_layout.get_v2p());
     std::unordered_map<int, int> pre_executed_counts;
     std::vector<int> front_layer; 
 
@@ -137,9 +138,81 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
 
             continue;
         }
+        std::set<int> extended_set = _calc_extended_set(dag, front_layer);
+        // std::cout << "extended_set: ";
+        // for (const auto& item : extended_set) 
+        //     std::cout << item << ", ";
+        // std::cout << std::endl;
+
+        std::set<std::pair<int, int>> swap_candidates = _obtain_swaps(front_layer, current_layout, dag);
+        // for (const auto& swap : swap_candidates) {
+        //     std::cout << "(" << swap.first << ", " << swap.second << ")" << std::endl;
+        // } 
+
+
         break;
     }
 
-    if (this->modify_dag == true)   return mapped_dag;
-    else return dag;
+    if (this->modify_dag)   
+        return mapped_dag;
+    else 
+        return dag;
 }
+
+
+
+std::set<int> SabreRouting::_calc_extended_set(const DAGCircuit& dag, const std::vector<int>& front_layer)
+{
+    /*Calculate the extended set for lookahead capabilities.
+    Args:
+        dag (DAGCircuit): a dag
+        front_layer (list): The front layer in the dag.
+    Returns:
+        extended_set (set): Set of expansion gates obtained according to requirements.
+    */ 
+
+    std::set<int> extended_set{};
+    std::vector<int> new_front_layer(front_layer);
+
+    while ( !new_front_layer.empty() && extended_set.size() < this->extended_set_size )
+    {
+        int node_index = new_front_layer.front();
+        new_front_layer.erase(new_front_layer.begin());  
+
+        auto successors_nodes = this->_dag_successors(dag, node_index);
+        new_front_layer.insert(new_front_layer.end(), successors_nodes.begin(), successors_nodes.end());          
+
+        for (int successor : successors_nodes)
+        {
+            const auto& node = dag.graph[successor];
+            if ( node.qubit_pos.size() == 2 )
+                extended_set.insert(successor);
+        }   
+    }
+    return extended_set;
+}
+
+
+std::set<SwapPos> SabreRouting::_obtain_swaps(const std::vector<int>& front_layer, const Layout& current_layout, const DAGCircuit& dag)
+{   
+    std::set<SwapPos> candiate_swaps{};
+    for ( const auto& node_index : front_layer )
+    {
+        for ( const auto& virtual_pos : dag.graph[node_index].qubit_pos )
+        {
+            int physical_pos = current_layout[virtual_pos];
+            auto neighbors = boost::adjacent_vertices(physical_pos, c_circuit.graph);
+
+            for ( auto it =  neighbors.first; it != neighbors.second; ++it )
+            {
+                int virtual_neighbor = current_layout.get_p2v().at(*it);
+                SwapPos swap = std::minmax(virtual_pos, virtual_neighbor);
+                candiate_swaps.insert(swap);
+            }
+        }
+    }
+    return candiate_swaps;
+}
+
+
+

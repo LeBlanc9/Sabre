@@ -1,5 +1,6 @@
 #pragma once
 #include "backend.h"
+#include "layout.h"
 #include <map> 
 
 
@@ -9,8 +10,8 @@ private:
     Backend _backend;
 
 public:
-    std::unordered_map<int, int> init_layout;
-    std::unordered_map<int, int> final_layout;
+    Layout init_layout;
+    Layout final_layout;
 
     Model();
     Model(Backend backend);
