@@ -4,18 +4,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <vector>
 #include "layout.h"
-
-SabreRouting::SabreRouting(const CouplingCircuit& c_circuit) : c_circuit(c_circuit) {}
-
-void SabreRouting::set_model(Model& model) 
-{
-    this->model_ptr = std::make_shared<Model>(model);
-}
-
-Model SabreRouting::get_model() 
-{
-    return *(this->model_ptr);
-}
+#include "sabre_routing.h"
 
 /*
     Return a @c DAGCircuit : The original dag or the mapped_dag with added swap gate depending on modify_flag.
@@ -193,7 +182,9 @@ std::set<int> SabreRouting::_calc_extended_set(const DAGCircuit& dag, const std:
 }
 
 
-std::set<SwapPos> SabreRouting::_obtain_swaps(const std::vector<int>& front_layer, const Layout& current_layout, const DAGCircuit& dag)
+std::set<SwapPos> SabreRouting::_obtain_swaps(  const std::vector<int>& front_layer, 
+                                                const Layout& current_layout, 
+                                                const DAGCircuit& dag )
 {   
     std::set<SwapPos> candiate_swaps{};
     for ( const auto& node_index : front_layer )
@@ -214,5 +205,86 @@ std::set<SwapPos> SabreRouting::_obtain_swaps(const std::vector<int>& front_laye
     return candiate_swaps;
 }
 
+void SabreRouting::_get_best_swap(const std::set<SwapPos>& swap_candidates, 
+                    const Layout& current_layout, 
+                    const std::vector<int>& front_layer, 
+                    const std::set<int>& extended_set, 
+                    const std::set<std::pair<int, int>>& unavailable_2qubits) const
+{
+    /*Get the best swap based on different heuristics.
+
+    Args:
+        swap_candidates (set): The set of all candidate swap gates.
+        current_layout (Layout): current layout
+        front_layer (list): front layer gates list
+        extended_set (set): set of expansion gates
+        unavailable_2qubits (set): set of unavailable two-qubits
+    Returns:
+        best_swap (tuple): the best swap based on different heuristics
+    */
+    std::map<SwapPos, double> swap_scores;
+    for ( const auto& swap : swap_candidates )
+        swap_scores[swap] = -1000000; 
+
+    if ( this->heuristic == Heuristic::Fidelity )
+    {
+        for ( const auto& swap : swap_candidates )  
+        {
+            SwapPos physical_swap = std::minmax(physical_swap.first, physical_swap.second);
+            if (unavailable_2qubits.find(physical_swap) == unavailable_2qubits.end())
+            {
+                double swap_cost = _swap_score(physical_swap);
 
 
+            } 
+        }
+
+    }
+
+    else if ( this->heuristic == Heuristic::Distance )
+    {
+    
+
+    }
+    else if ( this->heuristic == Heuristic::Mixture )
+    {}
+}
+
+
+double SabreRouting::_score_heuristic(  Heuristic heuristic, 
+                                        std::vector<int> front_layer, 
+                                        std::set<int> extended_set, 
+                                        Layout current_layout) const 
+{
+
+    Layout trial_layout = Layout(current_layout);
+    if ( heuristic == Heuristic::Distance ) 
+    {
+          
+    }
+
+
+    return 0;
+}
+
+
+inline int _compute_distance_cost(  const DAGCircuit& dag, 
+                                    const std::vector<int>& layer,
+                                    const Layout& layout)
+    /*
+        Calculate the distance sum of the gates list (layer) of the given layout.
+        Args:
+            layer: Gates list of a certain layer of the circuit.
+            layout (Layout): Mapping of virtual qubits to physical qubits.
+        Returns:
+                cost (int): distance sum of the gates list in the given layer.
+    */
+{
+    int cost = 0;
+    for (auto node_index : layer) 
+    {
+        cost += layout[dag.graph[node_index].qubit_pos[0]];
+    }
+
+    return cost;
+}

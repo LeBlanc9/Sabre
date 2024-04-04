@@ -31,7 +31,6 @@ CouplingCircuit::CouplingCircuit(CouplingList c_list) : c_list(c_list) {
 
 
 
-void CouplingCircuit::update_num_qubits() { this->num_qubits = boost::num_vertices(this->graph); }
 
 void CouplingCircuit::draw_self() const { draw_dot(graph_to_dot(graph)); }
 void CouplingCircuit::print_self() const { print_graph(graph); }

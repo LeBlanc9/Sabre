@@ -22,9 +22,8 @@ public:
     Layout() = default;
     Layout(LayoutStructure layout_struc) : v2p(layout_struc) 
     {
-        for (const auto& pair : v2p) {
+        for (const auto& pair : v2p)
             p2v[pair.second] = pair.first;
-        }
     } 
     
     const int& operator[](int v) const 

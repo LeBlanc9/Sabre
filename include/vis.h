@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "dag.h"
-#include "coupling.h"
+#include "sabre_core.h"
 
 std::string vectorToString(const std::vector<int>& vec);
 

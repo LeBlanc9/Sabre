@@ -28,7 +28,7 @@ EdgeProperties::EdgeProperties(int qubit_id) : qubit_id(qubit_id) {}
 //* Class DAGCircuit
 DAGCircuit::DAGCircuit() {}
 DAGCircuit::DAGCircuit(DagGraph& graph) : graph(graph) {}
-void DAGCircuit::add_node(InstructionNode node) { boost::add_vertex(node, graph);}
+void DAGCircuit::add_node(const InstructionNode& node) { boost::add_vertex(node, graph);}
 void DAGCircuit::add_edge(int from, int to, EdgeProperties ep) { boost::add_edge(from, to, ep, graph); }
 int  DAGCircuit::get_num_nodes() const { return boost::num_vertices(graph); }
 

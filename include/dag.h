@@ -8,7 +8,9 @@
 #include <boost/graph/graphviz.hpp>
 #include <graphviz/gvc.h>
 
-struct InstructionNode {
+struct InstructionNode 
+{
+public:
     std::string name = "NoName";  // 门操作的名称
     std::vector<int> qubit_pos;
     //std::unordered_map<int, int> measure_pos = {};
@@ -22,7 +24,18 @@ struct InstructionNode {
     friend std::ostream& operator<< (std::ostream& os, const InstructionNode& node);
 };
 
-struct EdgeProperties {
+// TODO:
+// struct MesureNode : public InstructionNode 
+// {
+// public:
+//     const std::string name = "measure";
+//     std::unordered_map<int, int> measure_pos = {};
+// };
+
+
+
+struct EdgeProperties 
+{
 public:
     int qubit_id; // 1,2,3 for qubits 
 
@@ -33,14 +46,15 @@ public:
 using DagGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, InstructionNode, EdgeProperties, boost::bidirectionalS>;
 
 
-class DAGCircuit {
+class DAGCircuit 
+{
 public:
     DagGraph graph;
 
     DAGCircuit();
     DAGCircuit(DagGraph& graph);
     
-    void add_node(InstructionNode node);
+    void add_node(const InstructionNode& node);
     void add_edge(int from, int to, EdgeProperties ep);
     int get_num_nodes() const;    // return num of gates.
     inline std::set<int> get_qubits_used() const;

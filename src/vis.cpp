@@ -14,7 +14,8 @@ std::string vectorToString(const std::vector<int>& vec)
     return ss.str();
 }
 
-class DagNodeWriter {
+class DagNodeWriter 
+{
 public:
     DagGraph g;
     DagNodeWriter(DagGraph g) : g(g) {}
@@ -30,7 +31,8 @@ public:
     }
 };
 
-class DagEdgeWriter {
+class DagEdgeWriter 
+{
 public:
     DagGraph g;
     DagEdgeWriter(DagGraph g) : g(g) {}
@@ -57,7 +59,8 @@ public:
     }
 };
 
-class CouplingEdgeWriter {
+class CouplingEdgeWriter 
+{
 public:
     CouplingGraph g;
     CouplingEdgeWriter(CouplingGraph g) : g(g) {}

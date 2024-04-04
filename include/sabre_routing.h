@@ -1,11 +1,19 @@
 #pragma once
 #include <iostream>
 #include <model.h>
+#include <algorithm>
+#include <cmath>
 #include "dag.h"
 #include "coupling.h"
 #include "layout.h"
 
 using SwapPos = std::pair<int, int>;
+
+enum class Heuristic {
+    Fidelity,
+    Distance,
+    Mixture  
+};
 
 class SabreRouting
 {
@@ -19,33 +27,53 @@ public:
 private:
     const CouplingCircuit& c_circuit;
     std::shared_ptr<Model> model_ptr;
-    std::string heuristic = "distance";
+    Heuristic heuristic = Heuristic::Distance;
     std::unordered_map<int, int> qubits_decay = {};
     
 public:
-    SabreRouting(const CouplingCircuit& c_circuit);
-    void set_model(Model& model);
-    Model get_model();
+    SabreRouting(const CouplingCircuit& c_circuit) : c_circuit(c_circuit) {}
+
+    void set_model(Model& model) { this->model_ptr = std::make_shared<Model>(model); }
+
+    Model get_model() { return *(this->model_ptr); }
+
     DAGCircuit run(const DAGCircuit& dag); 
 
 private:
-    inline void _apply_gate(DAGCircuit& mapped_dag, InstructionNode node, Layout& current_layout) const;
+    inline void _apply_gate(DAGCircuit& mapped_dag, 
+                            const InstructionNode& node, 
+                            const Layout& current_layout) const;
 
-    inline std::vector<int> _dag_successors(const DAGCircuit& dag, int node_index) const;
+    inline std::vector<int> _dag_successors(const DAGCircuit& dag, 
+                                            int node_index) const;
     
     inline void _reset_qubits_decay();
 
-    std::set<int> _calc_extended_set(const DAGCircuit& dag, const std::vector<int>& front_layer);
+    inline double _swap_score(const SwapPos& physical_swap_qubits) const;
 
-    std::set<SwapPos> _obtain_swaps(const std::vector<int>& front_layer, const Layout& current_layout, const DAGCircuit& dag);
+    std::set<int> _calc_extended_set(const DAGCircuit& dag, 
+                                     const std::vector<int>& front_layer);
 
-    // def _get_best_swap(self, swap_candidates, current_layout, front_layer, extended_set, unavailable_2qubits):
-    void _get_best_swap(const std::set<SwapPos>& swap_candidates, const Layout& current_layout, const std::vector<int>& front_layer, const std::set<int>& extended_set, const std::set<std::pair<int, int>>& unavailable_2qubits) const;
+    std::set<SwapPos> _obtain_swaps(const std::vector<int>& front_layer, 
+                                    const Layout& current_layout, 
+                                    const DAGCircuit& dag);
 
+    void _get_best_swap(const std::set<SwapPos>& swap_candidates, 
+                        const Layout& current_layout, 
+                        const std::vector<int>& front_layer, 
+                        const std::set<int>& extended_set, 
+                        const std::set<std::pair<int, int>>& unavailable_2qubits) const;
+
+    double _score_heuristic(Heuristic heuristic, 
+                            std::vector<int> front_layer, 
+                            std::set<int> extended_set, 
+                            Layout current_layout) const; 
 };
 
 
-inline void SabreRouting::_apply_gate(DAGCircuit& mapped_dag, InstructionNode node, Layout& current_layout) const 
+inline void SabreRouting::_apply_gate(  DAGCircuit& mapped_dag, 
+                                        const InstructionNode& node, 
+                                        const Layout& current_layout) const 
 {
     if (this->modify_dag == true) 
     {
@@ -68,9 +96,23 @@ inline std::vector<int> SabreRouting::_dag_successors(const DAGCircuit& dag, int
     return successors;
 }
 
-
 inline void SabreRouting::_reset_qubits_decay()
 {
     for (auto& pair : this->qubits_decay) 
         pair.second = 1;
+}
+
+
+inline double SabreRouting::_swap_score(const SwapPos& physical_swap_qubits) const
+{
+    const auto pair_forward = boost::edge(physical_swap_qubits.first, physical_swap_qubits.second, c_circuit.graph); 
+    const auto pair_backward = boost::edge(physical_swap_qubits.second, physical_swap_qubits.first, c_circuit.graph); 
+
+    const double fidelity_forward = boost::get(boost::edge_bundle, c_circuit.graph)[pair_forward.first].fidelity;
+    const double fidelity_backward =  boost::get(boost::edge_bundle, c_circuit.graph)[pair_backward.first].fidelity;
+
+    const double min_f = std::min(std::log(fidelity_forward), std::log(fidelity_backward));    
+    const double max_f = std::max(std::log(fidelity_forward), std::log(fidelity_backward));    
+
+    return 2 * max_f + min_f;
 }

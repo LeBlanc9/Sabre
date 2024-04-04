@@ -42,7 +42,7 @@ def get_preset_model():
 
 def get_random_qc():
     gate_list = ['cx', 'rxx', 'rzz', 'rx', 'id', 'h']
-    rqc = RandomCircuit(num_qubit=6, gates_number=10, gates_list=gate_list)
+    rqc = RandomCircuit(num_qubit=6, gates_number=30, gates_list=gate_list)
     qc = rqc.random_circuit()
     # qc.measure([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])
     #qc.plot_circuit()
@@ -52,12 +52,14 @@ def get_random_qc():
 
 def test_coupling():
     c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9), (4,3,0.9), (5,4, 0.99), (4,5,0.99)]
-    c_circuit = CouplingCircuit_cpp(c_list)
+    # c_list = [(0, 1,0.95), (1, 0,0.95), (0,2, 0.99), (2,0,0.99)]
+    c_circuit = CouplingGraph(c_list)
+    c_circuit_cpp = CouplingCircuit_cpp(c_list)
     # c_circuit.draw_self()
     backend = Backend_cpp(c_list)
     model = Model_cpp(backend)
 
-    return c_circuit
+    return c_circuit, c_circuit_cpp
 
 def test_dag():
     simple = QuantumCircuit(3)
@@ -83,10 +85,7 @@ def test_dag():
     return dag, cpp_dag; 
 
 
-if __name__ == "__main__":
-
-
-
+def test_sabre_routing():
     c_circuit = test_coupling()
     model = get_preset_model()
     
@@ -120,3 +119,14 @@ if __name__ == "__main__":
     st = time.time()
     sabre_routing_cpp.run(dag_cpp)
     print(f"cpp-time: {time.time()-st}")
+
+
+if __name__ == "__main__":
+    c_circuit, c_circuit_cpp = test_coupling()
+
+    print(c_circuit.distance_matrix)
+    a = np.array(c_circuit_cpp.get_distance_matrix())
+    print(a)
+    print(type(a))
+    
+
