@@ -6,7 +6,7 @@
 #include <boost/graph/graph_utility.hpp>
 
 
-//* Struct InstructionNode
+// Struct InstructionNode
 InstructionNode::InstructionNode() {}
 InstructionNode::InstructionNode(const std::string& name) : name(name) {}
 InstructionNode::InstructionNode(const std::string& name, std::vector<int> qubit_pos) : name(name), qubit_pos(qubit_pos) {}
@@ -20,12 +20,12 @@ std::ostream& operator<< (std::ostream& os, const InstructionNode& node)
 }
 
 
-//* Struct Edge
+// Struct Edge
 EdgeProperties::EdgeProperties() : qubit_id(-1) {}
 EdgeProperties::EdgeProperties(int qubit_id) : qubit_id(qubit_id) {}
 
 
-//* Class DAGCircuit
+// Class DAGCircuit
 DAGCircuit::DAGCircuit() {}
 DAGCircuit::DAGCircuit(DagGraph& graph) : graph(graph) {}
 void DAGCircuit::add_node(const InstructionNode& node) { boost::add_vertex(node, graph);}

@@ -20,46 +20,51 @@ private:
 
 public:
     Layout() = default;
-    Layout(LayoutStructure layout_struc) : v2p(layout_struc) 
-    {
+    Layout(LayoutStructure layout_struc) : v2p(layout_struc) {
         for (const auto& pair : v2p)
             p2v[pair.second] = pair.first;
     } 
     
-    const int& operator[](int v) const 
-    { return v2p.at(v); }
+    const int& operator[](int v) const { 
+        return v2p.at(v); 
+    }
 
-    bool empty() const 
-    { return v2p.empty() && p2v.empty(); }
+    bool empty() const { 
+        return v2p.empty() && p2v.empty(); 
+    }
 
-    const LayoutStructure& get_v2p() const 
-    { return v2p; }
+    const LayoutStructure& get_v2p() const { 
+        return v2p; 
+    }
 
-    const LayoutStructure& get_p2v() const 
-    { return p2v; }
+    const LayoutStructure& get_p2v() const { 
+        return p2v; 
+    }
 
-    void set_v2p( const LayoutStructure& v2p) 
-    { 
+    void set_v2p( const LayoutStructure& v2p) { 
         this->v2p = v2p; 
         _update_p2v();
     }
 
-    void set_p2v( const LayoutStructure& p2v) 
-    { 
+    void set_p2v( const LayoutStructure& p2v) { 
         this->p2v = p2v; 
         _updata_v2p();
     }
 
+    void swap(int a, int b) {
+        std::swap(v2p[a], v2p[b]);
+        _update_p2v();      
+    }
+
+
 private:
-    void _update_p2v() 
-    {
+    void _update_p2v() {
         p2v.clear();
         for (const auto& pair : v2p)
             p2v[pair.second] = pair.first;
     }
 
-    void _updata_v2p()
-    {
+    void _updata_v2p() {
         v2p.clear();
         for (const auto& pair : p2v)
             v2p[pair.second] = pair.first;

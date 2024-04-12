@@ -41,8 +41,8 @@ def get_preset_model():
     return model
 
 def get_random_qc():
-    gate_list = ['cx', 'rxx', 'rzz', 'rx', 'id', 'h']
-    rqc = RandomCircuit(num_qubit=6, gates_number=30, gates_list=gate_list)
+    gate_list = ['cx', 'rxx', 'rzz', 'h']
+    rqc = RandomCircuit(num_qubit=6, gates_number=50, gates_list=gate_list)
     qc = rqc.random_circuit()
     # qc.measure([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])
     #qc.plot_circuit()
@@ -85,48 +85,7 @@ def test_dag():
     return dag, cpp_dag; 
 
 
-def test_sabre_routing():
-    c_circuit = test_coupling()
-    model = get_preset_model()
-    
-
-    qc = get_random_qc()
-    dag = circuit_to_dag(qc)
-    dag_cpp = dag_to_cppDag(dag)
-    dag_cpp.draw_self()
-
-
-
-    
-    sabre_routing = SabreRouting()
-    sabre_routing.set_model(model)
-
-    print("---- python ----")
-    st = time.time()
-    sabre_routing.run(dag)
-    print(f"python-time: {time.time()-st}")
-
-
-    model_cpp = Model_cpp() 
-    print(sabre_routing.model._layout["initial_layout"].v2p)
-    model_cpp.init_layout =  Layout_cpp(sabre_routing.model._layout["initial_layout"].v2p)
-    
-
-    sabre_routing_cpp = SabreRouting_cpp(c_circuit)
-    sabre_routing_cpp.set_model(model_cpp)
-
-    print("----  c++   ----")
-    st = time.time()
-    sabre_routing_cpp.run(dag_cpp)
-    print(f"cpp-time: {time.time()-st}")
-
 
 if __name__ == "__main__":
-    c_circuit, c_circuit_cpp = test_coupling()
-
-    print(c_circuit.distance_matrix)
-    a = np.array(c_circuit_cpp.get_distance_matrix())
-    print(a)
-    print(type(a))
-    
-
+    # c_circuit, c_circuit_cpp = test_coupling()
+    pass

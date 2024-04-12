@@ -57,24 +57,59 @@ public:
     void add_node(const InstructionNode& node);
     void add_edge(int from, int to, EdgeProperties ep);
     int get_num_nodes() const;    // return num of gates.
-    inline std::set<int> get_qubits_used() const;
-    
 
+    std::set<int> get_qubits_used() const {
+        std::set<int> qubits_id_set;      
+        DagGraph::edge_iterator ei, ei_end;
+        for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei)
+            qubits_id_set.insert(graph[*ei].qubit_id);
+        return qubits_id_set;
+    }
+
+
+    // 获取某个节点的后继节点&前置节点
+    std::pair<std::vector<int>, std::vector<int>> get_related_node(int node_index) const {
+        std::vector<int> predecessors;
+        std::vector<int> successors;
+
+        DagGraph::edge_iterator ei, ei_end;
+        for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei) {
+            if (boost::target(*ei, graph) == node_index) {
+                predecessors.push_back(boost::source(*ei, graph));
+                successors.push_back(boost::target(*ei, graph));
+            }
+        }
+        return std::make_pair(predecessors, successors);
+    }
+
+    std::vector<int> get_predecessors_of_node(int node_index) const {
+        std::vector<int> predecessors;
+        DagGraph::edge_iterator ei, ei_end;
+        for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei) {
+            if (boost::target(*ei, graph) == node_index)
+                predecessors.push_back(boost::source(*ei, graph));
+        }
+        return predecessors;
+    }
+
+    std::vector<int> get_successors_of_node(int node_index) const {
+        std::vector<int> successors;
+        DagGraph::edge_iterator ei, ei_end;
+        for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei) {
+            if (boost::target(*ei, graph) == node_index)
+                successors.push_back(boost::target(*ei, graph));
+        }
+        return successors;
+    } 
+
+
+
+    std::vector<int> get_pre; 
+
+   
     void draw_self() const;
     void print_self() const;
 };
-
-inline std::set<int> DAGCircuit::get_qubits_used() const
-{
-    std::set<int> qubits_id_set;      
-    DagGraph::edge_iterator ei, ei_end;
-    for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei)
-        qubits_id_set.insert(graph[*ei].qubit_id);
-
-    return qubits_id_set;
-}
-
-
 
 
 

@@ -30,19 +30,19 @@ DAGCircuit test_dag() {
     boost::add_edge(2,4,EdgeProperties{2}, graph);
     boost::add_edge(3,4,EdgeProperties{3}, graph);
     boost::add_edge(1,3,EdgeProperties{4}, graph);
+    boost::add_edge(2,3,EdgeProperties{4}, graph);
 
     //std::cout << graph[2].name << std::endl;
 
     DAGCircuit dag_circuit{graph};
-    std::cout << "dag_circuit qubit used: " << dag_circuit.get_qubits_used().size() << std::endl;
-    print_graph(dag_circuit.graph);
-    //dag_circuit.draw_self();
-    //boost::print_graph(dag);
+    dag_circuit.print_self();
 
-    DagGraph rev_graph = reverse_DagGraph(dag_circuit.graph);
-    DAGCircuit rev{rev_graph};
-    //rev.draw_self();
-    //draw_graph(rev_graph);
+
+    std::vector<int> predecessors = dag_circuit.get_predecessors_of_node(3);
+    for (const auto& predecessor : predecessors) {
+        std::cout << predecessor << " ";
+    }
+    std::cout << std::endl;
 
     return dag_circuit;
 }
@@ -82,11 +82,7 @@ void test_sabre_routing() {
 int main() {
     std::cout << "---- main function ----" << std::endl;
     // test_c_ciruit();
-    // test_dag();
+    test_dag();
     // test_sabre_routing();
-    Layout init_layout;
-    if (init_layout.empty()) {
-        std::cout << "init_layout is empty" << std::endl;
-    }
 
 }

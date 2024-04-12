@@ -15,8 +15,7 @@ enum class Heuristic {
     Mixture  
 };
 
-class SabreRouting
-{
+class SabreRouting {
 public:
     bool modify_dag = false;
     float decay_delta = 0.001;
@@ -26,9 +25,11 @@ public:
 
 private:
     const CouplingCircuit& c_circuit;
+    const Matrix distance_matrix = c_circuit.get_distance_matrix();
     std::shared_ptr<Model> model_ptr;
     Heuristic heuristic = Heuristic::Distance;
     std::unordered_map<int, int> qubits_decay = {};
+    int add_swap_counter = 0;
     
 public:
     SabreRouting(const CouplingCircuit& c_circuit) : c_circuit(c_circuit) {}
@@ -40,8 +41,11 @@ public:
     DAGCircuit run(const DAGCircuit& dag); 
 
 private:
+    inline std::vector<int> _init_front_layer(const DAGCircuit& dag) const;  //TODO
+
     inline void _apply_gate(DAGCircuit& mapped_dag, 
-                            const InstructionNode& node, 
+                            const DAGCircuit& dag,
+                            const int& node_index, 
                             const Layout& current_layout) const;
 
     inline std::vector<int> _dag_successors(const DAGCircuit& dag, 
@@ -58,36 +62,43 @@ private:
                                     const Layout& current_layout, 
                                     const DAGCircuit& dag);
 
-    void _get_best_swap(const std::set<SwapPos>& swap_candidates, 
-                        const Layout& current_layout, 
-                        const std::vector<int>& front_layer, 
-                        const std::set<int>& extended_set, 
-                        const std::set<std::pair<int, int>>& unavailable_2qubits) const;
+    SwapPos _get_best_swap( const DAGCircuit& dag,
+                            const std::set<SwapPos>& swap_candidates, 
+                            const Layout& current_layout, 
+                            const std::vector<int>& front_layer, 
+                            const std::set<int>& extended_set, 
+                            const std::set<std::pair<int, int>>& unavailable_2qubits) const;
 
-    double _score_heuristic(Heuristic heuristic, 
-                            std::vector<int> front_layer, 
-                            std::set<int> extended_set, 
-                            Layout current_layout) const; 
+    double _score_heuristic(const DAGCircuit& dag, 
+                            const std::vector<int>& front_layer, 
+                            const std::set<int>& extended_set, 
+                            const Layout& current_layout,
+                            const SwapPos& swap_pos) const;
+
+    double _compute_distance_cost(  const DAGCircuit& dag, 
+                                    const std::vector<int>& layer,
+                                    const Layout& layout) const;
 };
 
 
 inline void SabreRouting::_apply_gate(  DAGCircuit& mapped_dag, 
-                                        const InstructionNode& node, 
-                                        const Layout& current_layout) const 
-{
-    if (this->modify_dag == true) 
-    {
+                                        const DAGCircuit& dag,
+                                        const int& node_index, 
+                                        const Layout& current_layout) const {
+    if (this->modify_dag == true) {
         std::vector<int> mapped_qubit_pos;
-        for (const auto& qubit_pos : node.qubit_pos) 
+        for (const auto& qubit_pos : dag.graph[node_index].qubit_pos) 
             mapped_qubit_pos.push_back(current_layout[qubit_pos]);
 
+
+
         // Add the gate to the mapped_dag
-        mapped_dag.add_node(node);
+        // dag.get_predecessors_of_node();
+        mapped_dag.add_node(dag.graph[node_index]);
     }
 }
 
-inline std::vector<int> SabreRouting::_dag_successors(const DAGCircuit& dag, int node_index) const
-{
+inline std::vector<int> SabreRouting::_dag_successors(const DAGCircuit& dag, int node_index) const {
     std::vector<int> successors;
     auto out_edges = boost::out_edges(node_index, dag.graph);
     for (auto it = out_edges.first; it != out_edges.second; ++it) 
@@ -96,15 +107,13 @@ inline std::vector<int> SabreRouting::_dag_successors(const DAGCircuit& dag, int
     return successors;
 }
 
-inline void SabreRouting::_reset_qubits_decay()
-{
+inline void SabreRouting::_reset_qubits_decay() {
     for (auto& pair : this->qubits_decay) 
         pair.second = 1;
 }
 
 
-inline double SabreRouting::_swap_score(const SwapPos& physical_swap_qubits) const
-{
+inline double SabreRouting::_swap_score(const SwapPos& physical_swap_qubits) const {
     const auto pair_forward = boost::edge(physical_swap_qubits.first, physical_swap_qubits.second, c_circuit.graph); 
     const auto pair_backward = boost::edge(physical_swap_qubits.second, physical_swap_qubits.first, c_circuit.graph); 
 

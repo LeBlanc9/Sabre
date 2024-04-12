@@ -23,7 +23,8 @@ PYBIND11_MODULE(sabre, m) {
         .def(py::init<const CouplingCircuit&>()) 
         .def("set_model", &SabreRouting::set_model)
         .def("get_model", &SabreRouting::get_model)
-        .def("run", &SabreRouting::run );       
+        .def("run", &SabreRouting::run)
+        .def_readwrite("modify_dag", &SabreRouting::modify_dag);
 
     py::class_<Backend>(m, "Backend")
         .def(py::init<CouplingList>())
