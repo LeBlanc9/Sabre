@@ -13,8 +13,7 @@
 DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
     // Precheck
     std::set<int> qubits_used = dag.get_qubits_used();
-    if (qubits_used.size() == 1) 
-    { 
+    if (qubits_used.size() == 1) { 
         std::cerr << "Warning: single qubit circuit no need optimize." << std::endl;
         return dag; 
     }
@@ -28,7 +27,6 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
 
     // Parameter preparation before iteration.
     DAGCircuit mapped_dag;
-    mapped_dag.add_node(InstructionNode("start"));
 
     Layout current_layout;
     if (model_ptr->init_layout.empty())
@@ -91,7 +89,7 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
 
         if ( !execute_gate_list.empty() ) {
             for (const int& node_index : execute_gate_list) {
-                _apply_gate(mapped_dag, dag, node_index, current_layout);
+                _apply_gate(mapped_dag, dag.graph[node_index], current_layout);
                 front_layer.erase(std::remove(front_layer.begin(), front_layer.end(), node_index), front_layer.end());
 
                 for ( int successor : _dag_successors(dag, node_index) ) {
@@ -113,8 +111,8 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
         // 添加swap gate
         std::set<SwapPos> swap_candidates = _obtain_swaps(front_layer, current_layout, dag);
         const SwapPos best_swap = _get_best_swap(dag, swap_candidates, current_layout, front_layer, extended_set, unavailable_2qubits); 
-        // const InstructionNode swap_gate = InstructionNode("swap", {best_swap.first, best_swap.second}); 
-        // _apply_gate(mapped_dag, dag, swap_gate, current_layout);
+        const InstructionNode swap_gate = InstructionNode("swap", {best_swap.first, best_swap.second}); 
+        _apply_gate(mapped_dag, swap_gate, current_layout);
         this->add_swap_counter++;
         current_layout.swap(best_swap.first, best_swap.second);
 
@@ -144,11 +142,10 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
     }
 
     if (this->modify_dag)   {
-        mapped_dag.add_node(InstructionNode("end"));
         return mapped_dag;
-    }
-    else 
+    } else {
         return dag;
+    }
 }
 
 
@@ -176,7 +173,7 @@ std::set<int> SabreRouting::_calc_extended_set(const DAGCircuit& dag, const std:
             if ( node.qubit_pos.size() == 2 ) {
                 extended_set.insert(successor);
             }
-        }   
+        }
     }
     return extended_set;
 }
@@ -206,7 +203,7 @@ std::set<SwapPos> SabreRouting::_obtain_swaps(  const std::vector<int>& front_la
 
 SwapPos SabreRouting::_get_best_swap(   const DAGCircuit& dag,
                                         const std::set<SwapPos>& swap_candidates, 
-                                        const Layout& current_layout, 
+                                        const Layout& current_layout,
                                         const std::vector<int>& front_layer, 
                                         const std::set<int>& extended_set, 
                                         const std::set<std::pair<int, int>>& unavailable_2qubits) const {
@@ -241,8 +238,7 @@ SwapPos SabreRouting::_get_best_swap(   const DAGCircuit& dag,
             double score = _score_heuristic(dag, front_layer, extended_set, current_layout, swap);
             swap_scores[swap] = score;
         }
-
-        // 获取swap_scores最小值 对应的key
+        // get key of swap_scores mini_value
         auto best_swap = std::min_element(swap_scores.begin(), swap_scores.end(), 
             [](const std::pair<SwapPos, double>& a, const std::pair<SwapPos, double>& b) {
                 return a.second < b.second;

@@ -36,8 +36,6 @@ public:
         this->num_qubits = boost::num_vertices(graph); 
     }
 
-
-
     Matrix get_distance_matrix() const {
         Matrix distance_matrix(boost::num_vertices(graph), std::vector<int>(boost::num_vertices(graph)));
         boost::constant_property_map<CouplingGraph::edge_descriptor, int> weight_map(1);

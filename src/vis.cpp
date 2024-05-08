@@ -18,7 +18,9 @@ class DagNodeWriter
 {
 public:
     DagGraph g;
-    DagNodeWriter(DagGraph g) : g(g) {}
+
+public:
+    DagNodeWriter(const DagGraph& g) : g(g) {}
 
     template <typename VertexDescriptor, typename OutputStream>
     void operator()(OutputStream& os, VertexDescriptor v) const 
@@ -49,7 +51,9 @@ public:
 class CouplingNodeWriter {
 public:
     CouplingGraph g;
-    CouplingNodeWriter(CouplingGraph g) : g(g) {}
+
+public:
+    CouplingNodeWriter(const CouplingGraph& g) : g(g) {}
 
     template <typename VertexDescriptor, typename OutputStream>
     void operator()(OutputStream& os, VertexDescriptor v) const 
@@ -59,11 +63,12 @@ public:
     }
 };
 
-class CouplingEdgeWriter 
-{
+class CouplingEdgeWriter {
 public:
     CouplingGraph g;
-    CouplingEdgeWriter(CouplingGraph g) : g(g) {}
+
+public:
+    CouplingEdgeWriter(const CouplingGraph& g) : g(g) {}
 
     template <typename EdgeDescriptor, typename OutputStream>
     void operator()(OutputStream& os, EdgeDescriptor e) const 
@@ -73,15 +78,13 @@ public:
     }
 };
 
-std::string graph_to_dot(const DagGraph& graph) 
-{
+std::string graph_to_dot(const DagGraph& graph) {
     std::ostringstream os;
     boost::write_graphviz(os, graph, DagNodeWriter(graph), DagEdgeWriter(graph));
     return os.str();
 }
 
-std::string graph_to_dot(const CouplingGraph& graph) 
-{
+std::string graph_to_dot(const CouplingGraph& graph) {
     std::ostringstream os;
     boost::write_graphviz(os, graph, CouplingNodeWriter(graph), CouplingEdgeWriter(graph));
     return os.str();

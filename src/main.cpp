@@ -11,38 +11,27 @@
 #include <graphviz/gvc.h>
 
 DAGCircuit test_dag() {
-    InstructionNode node1{"a"};
+    InstructionNode node1{"start"};
     InstructionNode node2{"b"};
     InstructionNode node3{"c"};
 
     DagGraph graph;
     
-    auto v1 = boost::add_vertex(node1, graph);
-    auto v2 = boost::add_vertex(node2, graph);
-    auto v3 = boost::add_vertex(node3, graph);
-    auto v4 = boost::add_vertex(node3, graph);
-    auto v5 = boost::add_vertex(node3, graph);
+    auto v0 = boost::add_vertex(node1, graph);
+    auto v1 = boost::add_vertex(node2, graph);
+    auto v2 = boost::add_vertex(node3, graph);
 
-
-    //boost::remove_vertex(v2, graph);
     boost::add_edge(0,1,EdgeProperties{0}, graph);
     boost::add_edge(1,2,EdgeProperties{1}, graph);
-    boost::add_edge(2,4,EdgeProperties{2}, graph);
-    boost::add_edge(3,4,EdgeProperties{3}, graph);
-    boost::add_edge(1,3,EdgeProperties{4}, graph);
-    boost::add_edge(2,3,EdgeProperties{4}, graph);
+    boost::add_edge(0,2,EdgeProperties{1}, graph);
 
-    //std::cout << graph[2].name << std::endl;
+    DagGraph test_graph;
+    DAGCircuit dag_circuit{test_graph};
 
-    DAGCircuit dag_circuit{graph};
+    dag_circuit.add_instruction_node_end(InstructionNode{"a", {1, 2}});
+
     dag_circuit.print_self();
-
-
-    std::vector<int> predecessors = dag_circuit.get_predecessors_of_node(3);
-    for (const auto& predecessor : predecessors) {
-        std::cout << predecessor << " ";
-    }
-    std::cout << std::endl;
+    dag_circuit.draw_self();
 
     return dag_circuit;
 }
@@ -82,7 +71,6 @@ void test_sabre_routing() {
 int main() {
     std::cout << "---- main function ----" << std::endl;
     // test_c_ciruit();
-    test_dag();
     // test_sabre_routing();
-
+    test_dag();
 }

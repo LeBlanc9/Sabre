@@ -27,13 +27,13 @@ from quafu import QuantumCircuit
 from utils import *
 
 def get_preset_model():
-    c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9), (4,3,0.9), (5,4, 0.99), (4,5,0.99)]
+    c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9), (4,3,0.9), (5,4, 0.99), (4,5,0.99), (1,6, 0.99), (6,1, 0.99), (7,4, 0.99), (4,7,0.99),(5,8, 0.99), (8,5,0.99), (4,9,0.98), (9,4,0.98)]
     dataDict = DataDict()
     dataDict['coupling_list'] = c_list
     backend_properties = {
         'name': 'ExampleBackend',
         'backend_type': 'superconducting',
-        'qubits_num': 4,
+        'qubits_num': 10,
         'coupling_list': c_list,
     }
     backend_instance = Backend(**backend_properties)
@@ -42,7 +42,7 @@ def get_preset_model():
 
 def get_random_qc():
     gate_list = ['cx', 'rxx', 'rzz', 'h']
-    rqc = RandomCircuit(num_qubit=6, gates_number=50, gates_list=gate_list)
+    rqc = RandomCircuit(num_qubit=10, gates_number=100, gates_list=gate_list)
     qc = rqc.random_circuit()
     # qc.measure([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])
     #qc.plot_circuit()
@@ -51,8 +51,7 @@ def get_random_qc():
     return qc
 
 def test_coupling():
-    c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9), (4,3,0.9), (5,4, 0.99), (4,5,0.99)]
-    # c_list = [(0, 1,0.95), (1, 0,0.95), (0,2, 0.99), (2,0,0.99)]
+    c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9), (4,3,0.9), (5,4, 0.99), (4,5,0.99), (1,6, 0.99), (6,1, 0.99), (7,4, 0.99), (4,7,0.99),(5,8, 0.99), (8,5,0.99), (4,9,0.98), (9,4,0.98)]
     c_circuit = CouplingGraph(c_list)
     c_circuit_cpp = CouplingCircuit_cpp(c_list)
     # c_circuit.draw_self()
@@ -78,7 +77,7 @@ def test_dag():
     # simple.measure([2], [1])
 
     dag = circuit_to_dag(simple)
-    draw_dag(dag)
+    # draw_dag(dag)
     cpp_dag = dag_to_cppDag(dag)
     # cpp_dag.draw_self()
 
@@ -88,4 +87,5 @@ def test_dag():
 
 if __name__ == "__main__":
     # c_circuit, c_circuit_cpp = test_coupling()
+    test_dag()
     pass

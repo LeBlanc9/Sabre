@@ -44,8 +44,7 @@ private:
     inline std::vector<int> _init_front_layer(const DAGCircuit& dag) const;  //TODO
 
     inline void _apply_gate(DAGCircuit& mapped_dag, 
-                            const DAGCircuit& dag,
-                            const int& node_index, 
+                            const InstructionNode& node, 
                             const Layout& current_layout) const;
 
     inline std::vector<int> _dag_successors(const DAGCircuit& dag, 
@@ -82,21 +81,20 @@ private:
 
 
 inline void SabreRouting::_apply_gate(  DAGCircuit& mapped_dag, 
-                                        const DAGCircuit& dag,
-                                        const int& node_index, 
+                                        const InstructionNode& node, 
                                         const Layout& current_layout) const {
-    if (this->modify_dag == true) {
-        std::vector<int> mapped_qubit_pos;
-        for (const auto& qubit_pos : dag.graph[node_index].qubit_pos) 
+
+    if (this->modify_dag) {
+        std::vector<int> mapped_qubit_pos = {};
+        std::vector<int> mapped_cbit_pos = {};
+        for (const auto& qubit_pos : node.qubit_pos) {
             mapped_qubit_pos.push_back(current_layout[qubit_pos]);
-
-
-
-        // Add the gate to the mapped_dag
-        // dag.get_predecessors_of_node();
-        mapped_dag.add_node(dag.graph[node_index]);
+        }
+        InstructionNode mapped_op_node(node.name, mapped_qubit_pos);
+        mapped_dag.add_instruction_node_end(mapped_op_node);
     }
 }
+
 
 inline std::vector<int> SabreRouting::_dag_successors(const DAGCircuit& dag, int node_index) const {
     std::vector<int> successors;
