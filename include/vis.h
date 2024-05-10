@@ -2,6 +2,7 @@
 #include <string>
 #include "dag.h"
 #include "sabre_core.h"
+#include "coupling.h"
 
 std::string vectorToString(const std::vector<int>& vec);
 

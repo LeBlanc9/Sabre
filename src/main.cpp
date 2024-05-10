@@ -29,6 +29,8 @@ DAGCircuit test_dag() {
     DAGCircuit dag_circuit{test_graph};
 
     dag_circuit.add_instruction_node_end(InstructionNode{"a", {1, 2}});
+    dag_circuit.add_instruction_node_end(InstructionNode{"swap", {1, 2}});
+    dag_circuit.add_instruction_node_end(InstructionNode{"b", {2}});
 
     dag_circuit.print_self();
     dag_circuit.draw_self();

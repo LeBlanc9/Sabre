@@ -1,4 +1,6 @@
 #pragma once
-#include "coupling.h"
-#include "dag.h"
-#include "layout.h"
+
+using qubit_t = int;
+using cbit_t = int;
+using node_pos_t = int;
+using edge_pos_t = std::pair<node_pos_t, node_pos_t>;

@@ -21,13 +21,24 @@ struct InstructionNode
 public:
     std::string name = "NoName"; 
     std::vector<qubit_t> qubit_pos;
-    std::vector<cbit_t> classic_pos;
 
     InstructionNode();
     InstructionNode(const std::string& name);
     InstructionNode(const std::string& name, std::vector<int> pos);
 
     friend std::ostream& operator<< (std::ostream& os, const InstructionNode& node);
+};
+
+
+struct MeasureNode : public InstructionNode
+{
+public:
+    std::vector<cbit_t> classic_pos;
+
+public:
+    MeasureNode(std::vector<int> qubit_pos, std::vector<int> classic_pos) 
+        : InstructionNode("measure", qubit_pos), classic_pos(classic_pos) {
+    }
 };
 
 
@@ -41,11 +52,17 @@ public:
 };
 
 
-// using DagGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, InstructionNode, EdgeProperties>;
 using DagGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, InstructionNode, EdgeProperties>;
 
 
 class DAGCircuit
+/*
+   A directed acyclic graph (DAG) representation of a quantum circuit.     
+
+   Using boost graph library to represent the DAG.
+   Each vertex is an InstructionNode which represents a quantum gate or operation. 
+   Each edge is an EdgeProperties which represents qubit.
+*/ 
 {
 public:
     DagGraph graph;
@@ -105,7 +122,7 @@ public:
     void add_instruction_node(  const InstructionNode& node, 
                                 std::map<qubit_t, node_pos_t> predecessors, 
                                 std::map<qubit_t, node_pos_t> successors) {
-        // 1. 移除原本连接着的边                                
+        // 1. remove original edges                                
         std::set<edge_pos_t> qubits_pre_out_edges = {};
         std::set<edge_pos_t> qubits_suc_in_edges = {};
         for (const auto& qubit: node.qubit_pos) {
@@ -128,7 +145,7 @@ public:
         for (const auto& qubit : node.qubit_pos) {
             add_edge(predecessors[qubit], node_index, EdgeProperties{qubit});
             add_edge(node_index ,successors[qubit], EdgeProperties{qubit});
-        } 
+        }
     }
    
     void draw_self() const;
@@ -152,7 +169,7 @@ private:
     }
 
 
-    // return a dict of {qubits -> predecessors }of node
+    // return a dict of {qubits -> predecessors } of node
     std::map<qubit_t, int> node_qubits_predecessors(int node_index) const {
         std::map<qubit_t, int> predecessors;
         DagGraph::edge_iterator ei, ei_end;
@@ -161,6 +178,17 @@ private:
                 predecessors[graph[*ei].qubit_id] = boost::source(*ei, graph);
         }
         return predecessors;
+    }
+
+    // return a dict of {qubits -> successors } of node
+    std::map<qubit_t, int> node_qubits_successors(int node_index) const {
+        std::map<qubit_t, int> successors;
+        DagGraph::edge_iterator ei, ei_end;
+        for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei) {
+            if (boost::source(*ei, graph) == node_index)
+                successors[graph[*ei].qubit_id] = boost::source(*ei, graph);
+        }
+        return successors;
     }
 
     // return a dict of { qubits -> inedges } of node

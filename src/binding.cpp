@@ -52,8 +52,11 @@ PYBIND11_MODULE(sabre, m) {
         .def(py::init<>())
         .def(py::init<const std::string>())
         .def_readwrite("name", &InstructionNode::name)
-        .def_readwrite("qubit_pos", &InstructionNode::qubit_pos)
-        .def_readwrite("classic_pos", &InstructionNode::classic_pos);
+        .def_readwrite("qubit_pos", &InstructionNode::qubit_pos);
+        // .def_readwrite("classic_pos", &InstructionNode::classic_pos);
+
+    py::class_<MeasureNode>(m, "MeasureNode")
+        .def(py::init<std::vector<int>, std::vector<int>>());
 
     py::class_<EdgeProperties>(m, "EdgeProperties")
         .def(py::init<>())
