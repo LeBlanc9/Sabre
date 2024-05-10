@@ -42,7 +42,7 @@ def get_preset_model():
 
 def get_random_qc():
     gate_list = ['cx', 'rxx', 'rzz', 'h']
-    rqc = RandomCircuit(num_qubit=10, gates_number = 1000, gates_list=gate_list)
+    rqc = RandomCircuit(num_qubit=10, gates_number = 20, gates_list=gate_list)
     qc = rqc.random_circuit()
     # qc.measure([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])
     #qc.plot_circuit()

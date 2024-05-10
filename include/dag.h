@@ -12,7 +12,7 @@
 
 using qubit_t = int;
 using cbit_t = int;
-using node_pos_t = int;
+using node_pos_t = unsigned long;
 using edge_pos_t = std::pair<node_pos_t, node_pos_t>;
 
 
@@ -36,6 +36,10 @@ public:
     std::vector<cbit_t> classic_pos;
 
 public:
+    MeasureNode() 
+        : InstructionNode("measure") {
+    }
+
     MeasureNode(std::vector<int> qubit_pos, std::vector<int> classic_pos) 
         : InstructionNode("measure", qubit_pos), classic_pos(classic_pos) {
     }
@@ -49,6 +53,23 @@ public:
 
     EdgeProperties();
     EdgeProperties(qubit_t qubit_id);
+};
+
+
+struct Edge 
+/*
+    A struct to represent an edge in the DAG graph. For convenience, we use a struct to store the edge information.
+    It contains the source node, target node and the edge properties.
+*/
+{
+public:
+    node_pos_t source;    
+    node_pos_t target;
+    EdgeProperties ep;
+public:
+    Edge(node_pos_t source, node_pos_t target, EdgeProperties ep) 
+        : source(source), target(target), ep(ep){
+    }
 };
 
 
@@ -66,6 +87,9 @@ class DAGCircuit
 {
 public:
     DagGraph graph;
+private:
+    const node_pos_t start_node_pos = 0;
+    const node_pos_t end_node_pos = 1;
 
 public:
     DAGCircuit();
@@ -90,23 +114,34 @@ public:
         return qubits_id_set;
     }
 
-
     void add_instruction_node_end(const InstructionNode& node) {
-        if (is_start_exist() && is_end_exist()) {
-            std::map<qubit_t, int> inf_predecessors = node_qubits_predecessors(1);
-            std::map<qubit_t, int> gate_predecessors = {};
-            std::map<qubit_t, int> gate_successors= {};
-            for (const auto& qubit: node.qubit_pos) {
-                if (inf_predecessors.find(qubit) == inf_predecessors.end()) {
-                    gate_predecessors[qubit] = 0; // 0 is the start node
-                } else {
-                    gate_predecessors[qubit] = inf_predecessors[qubit];
+        if (!this->empty()) {
+            const node_pos_t node_index = add_node(node);
+            std::vector<DagGraph::edge_descriptor> edges_to_remove;
+            std::vector<Edge> edges_to_add;
+            std::vector<qubit_t> node_remain_qubits = node.qubit_pos;  
+              
+            DagGraph::in_edge_iterator ei, ei_end;
+            for (boost::tie(ei, ei_end) = boost::in_edges(end_node_pos, graph); ei != ei_end; ++ei) {
+                const qubit_t qubit = graph[*ei].qubit_id; 
+                // 判断这条边的qubit是否在node的qubit_pos中
+                if ( std::find(node.qubit_pos.begin(), node.qubit_pos.end(), qubit) != node.qubit_pos.end() ) {
+                    edges_to_remove.push_back(*ei);
+                    edges_to_add.push_back(Edge{boost::source(*ei, graph), node_index, EdgeProperties{qubit}});
+                    edges_to_add.push_back(Edge{node_index, end_node_pos, EdgeProperties{qubit}});
+                    node_remain_qubits.erase(std::remove(node_remain_qubits.begin(), node_remain_qubits.end(), qubit), node_remain_qubits.end());     
                 }
             }
-            for (const auto& qubit: node.qubit_pos) {
-                gate_successors[qubit] = 1; // 1 is the end node
-            } 
-            add_instruction_node(node, gate_predecessors, gate_successors);
+            for (const auto& edge: edges_to_remove) {
+                boost::remove_edge(edge, graph);
+            }
+            for (const auto& edge: edges_to_add) {
+                boost::add_edge(edge.source, edge.target, edge.ep, graph);
+            }
+            for (const auto& qubit: node_remain_qubits) {
+                add_edge(start_node_pos, node_index, EdgeProperties{qubit});
+                add_edge(node_index, end_node_pos, EdgeProperties{qubit});
+            }
 
         } else {
             add_node(InstructionNode("start"));
@@ -119,97 +154,31 @@ public:
         }
     }
 
-    void add_instruction_node(  const InstructionNode& node, 
-                                std::map<qubit_t, node_pos_t> predecessors, 
-                                std::map<qubit_t, node_pos_t> successors) {
-        // 1. remove original edges                                
-        std::set<edge_pos_t> qubits_pre_out_edges = {};
-        std::set<edge_pos_t> qubits_suc_in_edges = {};
-        for (const auto& qubit: node.qubit_pos) {
-            std::set<int> qubits_used = get_qubits_used();
-            if  (qubits_used.find(qubit) != qubits_used.end()) {
-                std::map<qubit_t, edge_pos_t> pre_out_edges = node_qubits_outedges(predecessors[qubit]);
-                qubits_pre_out_edges.insert(pre_out_edges[qubit]);
 
-                std::map<qubit_t, edge_pos_t> suc_in_edges = node_qubits_inedges(successors[qubit]);
-                qubits_suc_in_edges.insert(suc_in_edges[qubit]);
-            }
-        }
-        qubits_pre_out_edges.insert(qubits_suc_in_edges.begin(), qubits_suc_in_edges.end()); // Merge two set to be removed
-        for (const auto& edge: qubits_pre_out_edges) {
-            remove_edge(edge);
-        }
-
-        // 2. Add New node and edges
-        int node_index = add_node(node); 
-        for (const auto& qubit : node.qubit_pos) {
-            add_edge(predecessors[qubit], node_index, EdgeProperties{qubit});
-            add_edge(node_index ,successors[qubit], EdgeProperties{qubit});
-        }
+    bool empty() const {
+        return get_num_nodes() == 0;
     }
-   
+
     void draw_self() const;
     void print_self() const;
 
 
 private:
-    bool is_start_exist() const {
+    bool _is_start_exist() const {
         return get_num_nodes() != 0 && graph[0].name == "start"; 
     }
 
-    bool is_end_exist() const {
+    bool _is_end_exist() const {
         return get_num_nodes() != 0 && graph[1].name == "end"; 
     }
 
     void remove_edge(node_pos_t source, node_pos_t target) {
         boost::remove_edge(source, target, graph);
     }
-    void remove_edge(edge_pos_t edge_pos) {
-        boost::remove_edge(edge_pos.first, edge_pos.second, graph);
+    void remove_edge(Edge edge) {
+        boost::remove_edge(edge.source, edge.target, graph);
     }
 
-
-    // return a dict of {qubits -> predecessors } of node
-    std::map<qubit_t, int> node_qubits_predecessors(int node_index) const {
-        std::map<qubit_t, int> predecessors;
-        DagGraph::edge_iterator ei, ei_end;
-        for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei) {
-            if (boost::target(*ei, graph) == node_index)
-                predecessors[graph[*ei].qubit_id] = boost::source(*ei, graph);
-        }
-        return predecessors;
-    }
-
-    // return a dict of {qubits -> successors } of node
-    std::map<qubit_t, int> node_qubits_successors(int node_index) const {
-        std::map<qubit_t, int> successors;
-        DagGraph::edge_iterator ei, ei_end;
-        for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei) {
-            if (boost::source(*ei, graph) == node_index)
-                successors[graph[*ei].qubit_id] = boost::source(*ei, graph);
-        }
-        return successors;
-    }
-
-    // return a dict of { qubits -> inedges } of node
-    std::map<qubit_t, edge_pos_t> node_qubits_inedges(int node_index) {
-        std::map<qubit_t, edge_pos_t> qubits_inedges;    
-        boost::graph_traits<DagGraph>::in_edge_iterator ei, ei_end; 
-        for (boost::tie(ei, ei_end) = boost::in_edges(node_index, graph); ei != ei_end; ++ei) {
-            qubits_inedges[graph[*ei].qubit_id] = std::make_pair( boost::source(*ei, graph), boost::target(*ei, graph) );
-        }
-        return qubits_inedges;
-    }
-
-    // return a dict of { qubits -> outedges } of node
-    std::map<qubit_t, edge_pos_t> node_qubits_outedges(int node_index) {
-        std::map<qubit_t, edge_pos_t> qubits_outedges;    
-        boost::graph_traits<DagGraph>::out_edge_iterator ei, ei_end; 
-        for (boost::tie(ei, ei_end) = boost::out_edges(node_index, graph); ei != ei_end; ++ei) {
-            qubits_outedges[graph[*ei].qubit_id] = std::make_pair( boost::source(*ei, graph), boost::target(*ei, graph) );
-        }
-        return qubits_outedges;
-    }
 };
 
 DagGraph reverse_DagGraph(const DagGraph& graph);

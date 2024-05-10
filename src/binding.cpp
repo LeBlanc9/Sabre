@@ -56,6 +56,7 @@ PYBIND11_MODULE(sabre, m) {
         // .def_readwrite("classic_pos", &InstructionNode::classic_pos);
 
     py::class_<MeasureNode>(m, "MeasureNode")
+        .def(py::init<>())
         .def(py::init<std::vector<int>, std::vector<int>>());
 
     py::class_<EdgeProperties>(m, "EdgeProperties")

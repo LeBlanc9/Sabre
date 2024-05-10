@@ -50,8 +50,8 @@ def node_to_cppNode(node: InstructionNode) -> Cpp_InstructionNode:
     # pass pos
     if isinstance(node.pos, list):
         cpp_node.qubit_pos = node.pos
-    elif isinstance(node.pos, dict):
-        cpp_node.qubit_pos = list(node.pos.keys())
-        cpp_node.classic_pos = list(node.pos.values())
+    # elif isinstance(node.pos, dict):
+    #     cpp_node.qubit_pos = list(node.pos.keys())
+    #     cpp_node.classic_pos = list(node.pos.values())
 
     return cpp_node
