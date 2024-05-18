@@ -3,7 +3,7 @@
 #include <model.h>
 #include <algorithm>
 #include <cmath>
-#include "dag.h"
+#include "DAG/dag.h"
 #include "coupling.h"
 #include "layout.h"
 
@@ -30,7 +30,7 @@ private:
     Heuristic heuristic = Heuristic::Distance;
     std::unordered_map<int, int> qubits_decay = {};
     int add_swap_counter = 0;
-    
+
 public:
     SabreRouting(const CouplingCircuit& c_circuit) : c_circuit(c_circuit) {}
 
@@ -90,7 +90,7 @@ inline void SabreRouting::_apply_gate(  DAGCircuit& mapped_dag,
         for (const auto& qubit_pos : node.qubit_pos) {
             mapped_qubit_pos.push_back(current_layout[qubit_pos]);
         }
-        InstructionNode mapped_op_node(node.name, mapped_qubit_pos);
+        InstructionNode mapped_op_node(node.name, mapped_qubit_pos, node.paras, node.duration, node.unit);
         mapped_dag.add_instruction_node_end(mapped_op_node);
     }
 }

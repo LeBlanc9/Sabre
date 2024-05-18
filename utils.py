@@ -1,5 +1,6 @@
 from build.sabre import DAGCircuit as Cpp_DAGCircuit
 from build.sabre import InstructionNode as Cpp_InstructionNode
+from build.sabre import MeasureNode as Cpp_MeasureNode
 from build.sabre import EdgeProperties
 
 import sys
@@ -10,9 +11,6 @@ from qusteed.dag.instruction_node import InstructionNode
 from quafu import QuantumCircuit
 
 
-def qc_to_cppDag():
-    # TODO:
-    pass
 
 
 def dag_to_cppDag(dag: DAGCircuit) -> Cpp_DAGCircuit:
@@ -35,23 +33,86 @@ def dag_to_cppDag(dag: DAGCircuit) -> Cpp_DAGCircuit:
 
 
 def node_to_cppNode(node: InstructionNode) -> Cpp_InstructionNode:
-    cpp_node = Cpp_InstructionNode()
-
-    # start_node & end_node
+    
     if node == -1:
+        cpp_node = Cpp_InstructionNode()
         cpp_node.name = "start"
         return cpp_node
-    if node == float('inf'):
+    elif node == float('inf'):
+        cpp_node = Cpp_InstructionNode()
         cpp_node.name = "end"
         return cpp_node
-    else:
+
+    elif isinstance(node.pos, list):
+        cpp_node = Cpp_InstructionNode()
         cpp_node.name = node.name 
-
-    # pass pos
-    if isinstance(node.pos, list):
         cpp_node.qubit_pos = node.pos
-    # elif isinstance(node.pos, dict):
-    #     cpp_node.qubit_pos = list(node.pos.keys())
-    #     cpp_node.classic_pos = list(node.pos.values())
 
-    return cpp_node
+        if node.paras:
+            cpp_node.paras = node.paras
+        if node.duration:
+            cpp_node.duration = node.duration
+        if  node.unit:
+            cpp_node.unit = node.unit
+        return cpp_node
+
+    elif isinstance(node.pos, dict):
+        if node.pos:
+            cpp_node = Cpp_MeasureNode(node.pos.keys(), node.pos.values())
+        else:
+            cpp_node = Cpp_MeasureNode()
+        return cpp_node
+
+
+def cppDag_to_dag(cppDag: Cpp_DAGCircuit) -> DAGCircuit:
+    # Starting Label Index
+    i = 0
+
+    # A dictionary to store the last use of any qubit
+    qubit_last_use = {}
+
+    # Add the start node 
+    dag = DAGCircuit()
+    dag.add_nodes_from([(-1, {"color": "green"})])
+
+    for vertex in cppDag.vertices():
+        if cppDag.graph[vertex].name == "start" or cppDag.graph[vertex].name == "end":
+            continue
+        else:
+            hashable_gate = cppNode_to_node(cppDag.graph[vertex], i)
+            i += 1
+
+            dag.add_node(hashable_gate, color="blue") 
+
+            for qubit in hashable_gate.pos:
+                if qubit in qubit_last_use:
+                    dag.add_edge(qubit_last_use[qubit], hashable_gate, label=f'q{qubit}')
+                else:
+                    dag.add_edge(-1, hashable_gate, label=f'q{qubit}', color="green")
+
+                qubit_last_use[qubit] = hashable_gate
+
+
+    dag.add_nodes_from([(float('inf'), {"color": "red"})])
+    for qubit in qubit_last_use:
+        dag.add_edge(qubit_last_use[qubit], float('inf'), label=f'q{qubit}', color="red")
+
+    dag.update_qubits_used()
+    dag.update_cbits_used()
+    dag.update_num_instruction_nodes()
+
+    return dag
+
+
+def cppNode_to_node(cpp_node: Cpp_InstructionNode, specific_label) -> InstructionNode:
+    node = InstructionNode(cpp_node.name, cpp_node.qubit_pos, cpp_node.paras, cpp_node.duration, cpp_node.unit, label=specific_label)
+    return node
+
+
+
+
+
+if __name__ == "__main__":
+    pass
+
+

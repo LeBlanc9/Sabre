@@ -27,13 +27,14 @@ from quafu import QuantumCircuit
 from utils import *
 
 def get_preset_model():
-    c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9), (4,3,0.9), (5,4, 0.99), (4,5,0.99), (1,6, 0.99), (6,1, 0.99), (7,4, 0.99), (4,7,0.99),(5,8, 0.99), (8,5,0.99), (4,9,0.98), (9,4,0.98)]
+    # c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9), (4,3,0.9), (5,4, 0.99), (4,5,0.99), (1,6, 0.99), (6,1, 0.99), (7,4, 0.99), (4,7,0.99),(5,8, 0.99), (8,5,0.99), (4,9,0.98), (9,4,0.98)]
+    c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96)] 
     dataDict = DataDict()
     dataDict['coupling_list'] = c_list
     backend_properties = {
         'name': 'ExampleBackend',
         'backend_type': 'superconducting',
-        'qubits_num': 4,
+        'qubits_num': 3,
         'coupling_list': c_list,
     }
     backend_instance = Backend(**backend_properties)
@@ -41,8 +42,8 @@ def get_preset_model():
     return model
 
 def get_random_qc():
-    gate_list = ['cx', 'rxx', 'rzz', 'h']
-    rqc = RandomCircuit(num_qubit=10, gates_number = 20, gates_list=gate_list)
+    gate_list = ['cx', 'rxx', 'h']
+    rqc = RandomCircuit(num_qubit=4, gates_number = 5000, gates_list=gate_list)
     qc = rqc.random_circuit()
     # qc.measure([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])
     #qc.plot_circuit()
@@ -51,8 +52,8 @@ def get_random_qc():
     return qc
 
 def test_coupling():
-    c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9), (4,3,0.9), (5,4, 0.99), (4,5,0.99), (1,6, 0.99), (6,1, 0.99), (7,4, 0.99), (4,7,0.99),(5,8, 0.99), (8,5,0.99), (4,9,0.98), (9,4,0.98)]
-    # c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96)] 
+    # c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96), (3,4,0.9), (4,3,0.9), (5,4, 0.99), (4,5,0.99), (1,6, 0.99), (6,1, 0.99), (7,4, 0.99), (4,7,0.99),(5,8, 0.99), (8,5,0.99), (4,9,0.98), (9,4,0.98)]
+    c_list = [(0, 1,0.95), (1, 0,0.95), (1,2,0.99), (2,3,0.96), (2,1,0.99), (3,2,0.96)] 
     c_circuit = CouplingGraph(c_list)
     c_circuit_cpp = CouplingCircuit_cpp(c_list)
     # c_circuit.draw_self()

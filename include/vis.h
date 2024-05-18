@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "dag.h"
+#include "DAG/dag.h"
 #include "sabre_core.h"
 #include "coupling.h"
 

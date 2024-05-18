@@ -7,70 +7,10 @@
 #include <boost/graph/labeled_graph.hpp>
 #include <boost/graph/graphviz.hpp>
 #include <graphviz/gvc.h>
-#include "gate_name.h"
+#include "sabre_core.h"
+#include "instructionNode.h"
+#include "edge.h"
 
-
-using qubit_t = int;
-using cbit_t = int;
-using node_pos_t = unsigned long;
-using edge_pos_t = std::pair<node_pos_t, node_pos_t>;
-
-
-struct InstructionNode 
-{
-public:
-    std::string name = "NoName"; 
-    std::vector<qubit_t> qubit_pos;
-
-    InstructionNode();
-    InstructionNode(const std::string& name);
-    InstructionNode(const std::string& name, std::vector<int> pos);
-
-    friend std::ostream& operator<< (std::ostream& os, const InstructionNode& node);
-};
-
-
-struct MeasureNode : public InstructionNode
-{
-public:
-    std::vector<cbit_t> classic_pos;
-
-public:
-    MeasureNode() 
-        : InstructionNode("measure") {
-    }
-
-    MeasureNode(std::vector<int> qubit_pos, std::vector<int> classic_pos) 
-        : InstructionNode("measure", qubit_pos), classic_pos(classic_pos) {
-    }
-};
-
-
-struct EdgeProperties 
-{
-public:
-    qubit_t qubit_id; // 1,2,3 for qubits 
-
-    EdgeProperties();
-    EdgeProperties(qubit_t qubit_id);
-};
-
-
-struct Edge 
-/*
-    A struct to represent an edge in the DAG graph. For convenience, we use a struct to store the edge information.
-    It contains the source node, target node and the edge properties.
-*/
-{
-public:
-    node_pos_t source;    
-    node_pos_t target;
-    EdgeProperties ep;
-public:
-    Edge(node_pos_t source, node_pos_t target, EdgeProperties ep) 
-        : source(source), target(target), ep(ep){
-    }
-};
 
 
 using DagGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, InstructionNode, EdgeProperties>;
@@ -92,19 +32,30 @@ private:
     const node_pos_t end_node_pos = 1;
 
 public:
-    DAGCircuit();
-    DAGCircuit(DagGraph& graph);
-    
+    DAGCircuit() {}
+    DAGCircuit(DagGraph& graph) : graph(graph) {}
+
     int add_node(const InstructionNode& node) {
         auto vertex_description = boost::add_vertex(node, graph);
         return vertex_description;
     }
-    void add_edge(int from, int to, const EdgeProperties& ep) {
+
+    void add_edge(const int from, const int to, const EdgeProperties& ep) {
         boost::add_edge(from, to, ep, graph); 
     }
+    void add_edge(const int from, const int to, const qubit_t qubit_id) {
+        boost::add_edge(from, to, EdgeProperties{qubit_id}, graph); 
+    }
+
     int get_num_nodes() const {
         return boost::num_vertices(graph); 
     }
+
+    bool empty() const {
+        return get_num_nodes() == 0;
+    }
+
+
 
     std::set<int> get_qubits_used() const {
         std::set<int> qubits_id_set;      
@@ -155,13 +106,16 @@ public:
     }
 
 
-    bool empty() const {
-        return get_num_nodes() == 0;
+    DagGraph::vertex_iterator vertex_begin() {
+        return boost::vertices(graph).first;
     }
+    DagGraph::vertex_iterator vertex_end() {
+        return boost::vertices(graph).second;
+    }
+
 
     void draw_self() const;
     void print_self() const;
-
 
 private:
     bool _is_start_exist() const {

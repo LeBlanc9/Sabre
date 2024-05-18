@@ -1,6 +1,6 @@
 #include <iostream>
 #include "sabre_layout.h"
-#include "dag.h"
+#include "DAG/dag.h"
 #include "coupling.h"
 #include "vis.h"
 #include "layout.h"
@@ -28,8 +28,12 @@ DAGCircuit test_dag() {
     DagGraph test_graph;
     DAGCircuit dag_circuit{test_graph};
 
-    dag_circuit.add_instruction_node_end(InstructionNode{"swap", {0, 1}});
-    dag_circuit.add_instruction_node_end(InstructionNode{"oneqbit_gate", {0,1,2}});
+    dag_circuit.add_instruction_node_end(InstructionNode{"swap", {0,1}});
+
+    MeasureNode measure_node{};
+    // MeasureNode measure_node();
+    dag_circuit.add_node(measure_node);
+    
 
     dag_circuit.print_self();
     dag_circuit.draw_self();

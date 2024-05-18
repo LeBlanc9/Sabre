@@ -22,17 +22,20 @@ include_directories(${Graphviz_INCLUDE_DIRS})
 link_directories("/opt/homebrew/Cellar/graphviz/10.0.1/lib")
 
 
-include_directories("include" "extern/pybind11/include")
+include_directories("extern/pybind11/include")
+include_directories("include" "include/DAG")
 ##! Test CPP  设置包含src目录下除了binding.cpp之外的所有文件
 file(GLOB SOURCES "src/*.cpp")
 list(FILTER SOURCES EXCLUDE REGEX "src/binding.cpp")
-add_executable(sabre_cpp ${SOURCES})
+file(GLOB DAG_SOURCES "src/DAG/*.cpp")
+
+add_executable(sabre_cpp ${SOURCES} ${DAG_SOURCES})
 target_link_libraries(sabre_cpp gvc cgraph)         # Graphviz
 target_link_libraries(sabre_cpp ${Boost_LIBRARIES}) # Boost
 
 
 ##! Test pybind
 add_subdirectory("extern/pybind11")
-pybind11_add_module(sabre src/binding.cpp ${SOURCES})
+pybind11_add_module(sabre src/binding.cpp ${SOURCES} ${DAG_SOURCES})
 target_link_libraries(sabre PRIVATE gvc cgraph)         # Graphviz
 target_link_libraries(sabre PRIVATE ${Boost_LIBRARIES}) # Boost

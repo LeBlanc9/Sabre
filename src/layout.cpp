@@ -1,7 +1,6 @@
 #include "layout.h"
 
-Layout generate_random_layout(int virtual_qubits, int physical_qubits) 
-{
+Layout generate_random_layout(int virtual_qubits, int physical_qubits) {
     if (virtual_qubits > physical_qubits) 
         throw std::invalid_argument("Error: The number of virtual qubits in the circuit cannot be greater than the number of physical qubits in the chip.");
 
@@ -25,14 +24,13 @@ Layout generate_random_layout(int virtual_qubits, int physical_qubits)
 
 
 
-void print_layout(const LayoutStructure& layout) 
-{
+void print_layout(const LayoutStructure& layout) {
     std::cout << "{";
-    for (auto it = layout.begin(); it != layout.end(); ++it) 
-    {
+    for (auto it = layout.begin(); it != layout.end(); ++it) {
         std::cout << it->first << ": " << it->second;
-        if (std::next(it) != layout.end())
+        if (std::next(it) != layout.end()) {
             std::cout << ", ";
+        }
     }
     std::cout << "}" << std::endl;
 }
