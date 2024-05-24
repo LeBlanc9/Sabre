@@ -6,6 +6,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/labeled_graph.hpp>
 #include <boost/graph/graphviz.hpp>
+#include <boost/graph/copy.hpp>
 #include <graphviz/gvc.h>
 #include "sabre_core.h"
 #include "instructionNode.h"
@@ -27,9 +28,12 @@ class DAGCircuit
 {
 public:
     DagGraph graph;
+    std::unordered_map<qubit_t, cbit_t> measure = {};
+
 private:
-    const node_pos_t start_node_pos = 0;
-    const node_pos_t end_node_pos = 1;
+
+    node_pos_t start_node_pos = 0;
+    node_pos_t end_node_pos = 1;
 
 public:
     DAGCircuit() {}
@@ -99,31 +103,49 @@ public:
             add_node(InstructionNode("end"));
             add_node(node);
             for (const auto& qubit: node.qubit_pos) {
-                add_edge(0, 2, EdgeProperties{qubit});
-                add_edge(2, 1, EdgeProperties{qubit});
+                add_edge(start_node_pos, 2, EdgeProperties{qubit});
+                add_edge(2, end_node_pos, EdgeProperties{qubit});
             }
         }
     }
 
+    DAGCircuit reverse() const {
 
-    DagGraph::vertex_iterator vertex_begin() {
+        DagGraph rev_graph;
+        boost::copy_graph(boost::make_reverse_graph(this->graph), rev_graph);
+        DAGCircuit rev_dag {rev_graph};
+
+        rev_dag.start_node_pos = this->end_node_pos;
+        rev_dag.end_node_pos = this->start_node_pos;
+        rev_dag.graph[rev_dag.start_node_pos].name = "start";
+        rev_dag.graph[rev_dag.end_node_pos].name = "end";
+        // rev_dag.graph[end_node_pos].name = "end";
+
+        return rev_dag;
+    }
+
+    void remove_measure_nodes(){
+        boost::remove_vertex(0, graph); 
+    } 
+
+
+    DagGraph::vertex_iterator vertex_begin() const{
         return boost::vertices(graph).first;
     }
-    DagGraph::vertex_iterator vertex_end() {
+    DagGraph::vertex_iterator vertex_end() const {
         return boost::vertices(graph).second;
     }
-
 
     void draw_self() const;
     void print_self() const;
 
 private:
     bool _is_start_exist() const {
-        return get_num_nodes() != 0 && graph[0].name == "start"; 
+        return get_num_nodes() != 0 && graph[start_node_pos].name == "start"; 
     }
 
     bool _is_end_exist() const {
-        return get_num_nodes() != 0 && graph[1].name == "end"; 
+        return get_num_nodes() != 0 && graph[end_node_pos].name == "end"; 
     }
 
     void remove_edge(node_pos_t source, node_pos_t target) {

@@ -111,8 +111,49 @@ def cppNode_to_node(cpp_node: Cpp_InstructionNode, specific_label) -> Instructio
 
 
 
+def QuantumCircuit_to_cppDag(circuit: QuantumCircuit) -> Cpp_DAGCircuit:
+    dag = Cpp_DAGCircuit()
 
-if __name__ == "__main__":
+    for gate in circuit.gates:
+        node = gate_to_cppNode(gate)
+        dag.add_instruction_node_end(node) 
+          
+    dag.measure = circuit.measures
+
+    return dag
+
+
+def gate_to_cppNode(gate) -> Cpp_InstructionNode:
+    if gate.paras == None:
+        paras = 0.0
+    else:
+        paras = gate.paras      
+
+    if getattr(gate, 'duration', False): 
+        duration = 0
+        unit = ""
+    else:
+        duration = gate.duration
+        unit = gate.unit
+
+    node = Cpp_InstructionNode(gate.name, gate.pos, paras, duration, unit)
+    return node
+
+
+
+
+
+
+
+
+
+
+def cppDag_to_QuantumCircuit():
+    # TODO
     pass
 
 
+
+
+if __name__ == "__main__":
+    pass

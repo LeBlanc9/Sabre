@@ -35,12 +35,46 @@ public:
 public:
 
     InstructionNode() {}
+
     InstructionNode(const std::string& name) 
         : name(name) {}
-    InstructionNode(const std::string& name, std::vector<int> qubit_pos) 
+
+    InstructionNode(const std::string& name, const std::vector<qubit_t> qubit_pos) 
         : name(name), qubit_pos(qubit_pos) {}
-    InstructionNode(const std::string& name, std::vector<int> qubit_pos, std::vector<double> paras, int duration, std::string unit) 
+
+    InstructionNode(const std::string& name, const qubit_t qubit_pos) 
+        : name(name), qubit_pos({qubit_pos}) {}
+
+
+    InstructionNode(const std::string& name, 
+                    const int qubit_pos, 
+                    const std::vector<double> paras, 
+                    const int duration, 
+                    const std::string unit) 
+        : name(name), qubit_pos({qubit_pos}), paras(paras), duration(duration), unit(unit) {}
+
+    InstructionNode(const std::string& name, 
+                    const std::vector<int> qubit_pos, 
+                    const std::vector<double> paras, 
+                    const int duration, 
+                    const std::string unit) 
         : name(name), qubit_pos(qubit_pos), paras(paras), duration(duration), unit(unit) {}
+
+    InstructionNode(const std::string& name, 
+                    const int qubit_pos, 
+                    const double paras, 
+                    const int duration, 
+                    const std::string unit) 
+        : name(name), qubit_pos({qubit_pos}), paras({paras}), duration(duration), unit(unit) {}
+
+    InstructionNode(const std::string& name, 
+                    const std::vector<int> qubit_pos, 
+                    const double paras, 
+                    const int duration, 
+                    const std::string unit) 
+        : name(name), qubit_pos(qubit_pos), paras({paras}), duration(duration), unit(unit) {}
+
+
 
 
     friend std::ostream& operator<< (std::ostream& os, const InstructionNode& node);

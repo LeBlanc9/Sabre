@@ -74,20 +74,22 @@ def test_dag():
     simple.delay(0, 100)
     simple.fredkin(0,1, 2)
     simple.mcx([0, 1], 2)
-    # simple.measure([0], [0])
-    # simple.measure([1], [2])
-    # simple.measure([2], [1])
+    simple.measure([0], [0])
+    simple.measure([1], [2])
+    simple.measure([2], [1])
 
-    dag = circuit_to_dag(simple)
+    # dag = circuit_to_dag(simple)
     # draw_dag(dag)
-    cpp_dag = dag_to_cppDag(dag)
-    # cpp_dag.draw_self()
 
-    return dag, cpp_dag; 
+    dag = QuantumCircuit_to_cppDag(simple)
+    print(dag.measure)
+
+    return dag 
 
 
 
 if __name__ == "__main__":
     # c_circuit, c_circuit_cpp = test_coupling()
-    test_dag()
-    pass
+    dag = test_dag()
+    dag.draw_self()
+    

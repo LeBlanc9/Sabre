@@ -11,31 +11,18 @@
 #include <graphviz/gvc.h>
 
 DAGCircuit test_dag() {
-    InstructionNode node1{"start"};
-    InstructionNode node2{"b"};
-    InstructionNode node3{"c"};
-
-    DagGraph graph;
-    
-    auto v0 = boost::add_vertex(node1, graph);
-    auto v1 = boost::add_vertex(node2, graph);
-    auto v2 = boost::add_vertex(node3, graph);
-
-    boost::add_edge(0,1,EdgeProperties{0}, graph);
-    boost::add_edge(1,2,EdgeProperties{1}, graph);
-    boost::add_edge(0,2,EdgeProperties{1}, graph);
-
     DagGraph test_graph;
     DAGCircuit dag_circuit{test_graph};
 
-    dag_circuit.add_instruction_node_end(InstructionNode{"swap", {0,1}});
+    dag_circuit.add_instruction_node_end(InstructionNode{"a", 0});
+    dag_circuit.add_instruction_node_end(InstructionNode{"b", 0});
+    dag_circuit.add_instruction_node_end(InstructionNode{"c", 0});
+    // dag_circuit.add_instruction_node_end(MeasureNode{0, 0});
 
-    MeasureNode measure_node{};
-    // MeasureNode measure_node();
-    dag_circuit.add_node(measure_node);
-    
+    // DAGCircuit dag_circuit_rev = dag_circuit.reverse();
+    // boost::remove_vertex(4,  dag_circuit.graph);
+    boost::clear_vertex(4,  dag_circuit.graph);
 
-    dag_circuit.print_self();
     dag_circuit.draw_self();
 
     return dag_circuit;

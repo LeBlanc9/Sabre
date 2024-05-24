@@ -51,7 +51,15 @@ PYBIND11_MODULE(sabre, m) {
     py::class_<InstructionNode>(m, "InstructionNode")
         .def(py::init<>())
         .def(py::init<const std::string>())
-        .def(py::init<const std::string, std::vector<int>>())
+
+        .def(py::init<const std::string, const std::vector<int>>())
+        .def(py::init<const std::string, const int>())
+
+        .def(py::init<const std::string, const int, const std::vector<double>, const int, const std::string>())
+        .def(py::init<const std::string, const std::vector<int>, const std::vector<double>, const int, const std::string>())
+        .def(py::init<const std::string, const int, const double, const int, const std::string>())
+        .def(py::init<const std::string, const std::vector<int>, const double, const int, const std::string>())
+
         .def_readwrite("name", &InstructionNode::name)
         .def_readwrite("qubit_pos", &InstructionNode::qubit_pos)
         .def_readwrite("paras", &InstructionNode::paras)
@@ -84,9 +92,11 @@ PYBIND11_MODULE(sabre, m) {
         .def("add_edge", py::overload_cast<const int, const int, const EdgeProperties&>(&DAGCircuit::add_edge))
         .def("get_num_nodes", &DAGCircuit::get_num_nodes)
         .def("vertices", [](DAGCircuit &s) {return py::make_iterator(s.vertex_begin(), s.vertex_end());})
+        .def("reverse", &DAGCircuit::reverse)
         .def("draw_self", &DAGCircuit::draw_self)
         .def("print_self", &DAGCircuit::print_self)
-        .def_readwrite("graph", &DAGCircuit::graph);
+        .def_readwrite("graph", &DAGCircuit::graph)
+        .def_readwrite("measure", &DAGCircuit::measure);
 
-    //m.def("draw_graph", &draw_graph, "Draw a Graph object");
+    // m.def("reverse_DagGraph", &reverse_DagGraph, "Reverse a DagGraph object");
 }

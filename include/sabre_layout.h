@@ -27,7 +27,7 @@ public:
 
     DAGCircuit run(const DAGCircuit& dag) {
         std::cout << "Run sabre layout !" << std::endl;
-        //* Precheck
+        //Precheck
         std::set<int> qubits_used = dag.get_qubits_used();
         if (qubits_used.size() == 1) { 
             std::cerr << "Warning: single qubit circuit no need optimize." << std::endl;
@@ -36,21 +36,22 @@ public:
         if (qubits_used.size() > this->c_circuit.num_qubits) 
             throw std::runtime_error("More virtual qubits than physical qubits.");
 
-        //* Presetting
-        // Todo: remove measure node    
-        this->routing_ptr->modify_dag = false;  // make sure modify_dag = false
-        DagGraph rev_graph = reverse_DagGraph(dag.graph);  
-        DAGCircuit rev_dag(rev_graph);
 
-        //* Start Iteration 
+        this->routing_ptr->modify_dag = false;  // make sure modify_dag = false
+        DAGCircuit rev_dag = dag.reverse();
+
+        // Start Iteration 
         for (int i=0; i < max_iteration; i++) {
             for (const auto& direction : {0, 1}) {
                 this->run_single(direction == 0 ? dag : rev_dag);
+                this->model_ptr->init_layout = this->routing_ptr->get_model().final_layout;
             }
         }
+
         // The last forward iteration obtains the final circuit. 
         this->routing_ptr->modify_dag = true;
         DAGCircuit physical_dag = this->run_single(dag);
+
 
         return dag;
     }

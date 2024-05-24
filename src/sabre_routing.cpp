@@ -111,7 +111,7 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
         // 添加swap gate
         std::set<SwapPos> swap_candidates = _obtain_swaps(front_layer, current_layout, dag);
         const SwapPos best_swap = _get_best_swap(dag, swap_candidates, current_layout, front_layer, extended_set, unavailable_2qubits); 
-        const InstructionNode swap_gate = InstructionNode("swap", {best_swap.first, best_swap.second}); 
+        const InstructionNode swap_gate = InstructionNode("swap", std::vector<qubit_t>{best_swap.first, best_swap.second}); 
         _apply_gate(mapped_dag, swap_gate, current_layout);
         this->add_swap_counter++;
         current_layout.swap(best_swap.first, best_swap.second);
@@ -121,13 +121,6 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
         int max_val = std::max(current_layout[best_swap.first], current_layout[best_swap.second]);
         executed_2gate_list.push_back({min_val, max_val});
         unavailable_2qubits.insert({min_val, max_val});
-
-        // for (const auto& pair : executed_2gate_list)
-        //     std::cout << "{" << pair.first << ", " << pair.second << "}" << " ";
-        // std::cout << std::endl;
-        // for (const auto& pair : unavailable_2qubits)
-        //     std::cout << "{" << pair.first << ", " << pair.second << "}" << " ";
-        // std::cout << std::endl;
 
 
         // 更新 qubits_decay
