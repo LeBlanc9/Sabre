@@ -1,3 +1,4 @@
+# For build system temp file
 build/
 .vscode/
 __pycache__/

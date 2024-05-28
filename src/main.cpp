@@ -15,15 +15,10 @@ DAGCircuit test_dag() {
     DAGCircuit dag_circuit{test_graph};
 
     dag_circuit.add_instruction_node_end(InstructionNode{"a", 0});
-    dag_circuit.add_instruction_node_end(InstructionNode{"b", 0});
-    dag_circuit.add_instruction_node_end(InstructionNode{"c", 0});
-    // dag_circuit.add_instruction_node_end(MeasureNode{0, 0});
+    dag_circuit.add_instruction_node_end(InstructionNode{"b", 1});
+    dag_circuit.add_instruction_node_end(InstructionNode{"c", 1});
 
-    // DAGCircuit dag_circuit_rev = dag_circuit.reverse();
-    // boost::remove_vertex(4,  dag_circuit.graph);
-    boost::clear_vertex(4,  dag_circuit.graph);
-
-    dag_circuit.draw_self();
+    // dag_circuit.draw_self();
 
     return dag_circuit;
 }
@@ -60,9 +55,17 @@ void test_sabre_routing() {
 }
 
 
+void test_sabre_layout() {
+    CouplingCircuit c_circuit = test_c_ciruit();
+    SabreLayout sabre_layout{c_circuit};
+    DAGCircuit dag = test_dag();
+    sabre_layout.run(dag);
+
+
 int main() {
     std::cout << "---- main function ----" << std::endl;
     // test_c_ciruit();
     // test_sabre_routing();
-    test_dag();
+    // test_dag();
+    test_sabre_layout();
 }

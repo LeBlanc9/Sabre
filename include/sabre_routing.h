@@ -22,11 +22,11 @@ public:
     int decay_reset_interval = 5;
     int extended_set_size = 20;
     float extended_set_weight = 0.5;
+    std::shared_ptr<Model> model;
 
 private:
     const CouplingCircuit& c_circuit;
     const Matrix distance_matrix = c_circuit.get_distance_matrix();
-    std::shared_ptr<Model> model_ptr;
     Heuristic heuristic = Heuristic::Distance;
     std::unordered_map<int, int> qubits_decay = {};
     int add_swap_counter = 0;
@@ -34,9 +34,13 @@ private:
 public:
     SabreRouting(const CouplingCircuit& c_circuit) : c_circuit(c_circuit) {}
 
-    void set_model(Model& model) { this->model_ptr = std::make_shared<Model>(model); }
+    void set_model(Model& model) { 
+        this->model = std::make_shared<Model>(model); 
+    }
 
-    Model get_model() { return *(this->model_ptr); }
+    Model get_model() { 
+        return *(this->model); 
+    }
 
     DAGCircuit run(const DAGCircuit& dag); 
 

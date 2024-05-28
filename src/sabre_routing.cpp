@@ -29,10 +29,10 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
     DAGCircuit mapped_dag;
 
     Layout current_layout;
-    if (model_ptr->init_layout.empty())
-        model_ptr->init_layout = generate_random_layout(qubits_used.size(), c_circuit.num_qubits);
+    if (model->init_layout.empty())
+        model->init_layout = generate_random_layout(qubits_used.size(), c_circuit.num_qubits);
 
-    current_layout = model_ptr->init_layout;
+    current_layout = model->init_layout;
 
     std::unordered_map<int, int> pre_executed_counts;
     std::vector<int> front_layer; 
@@ -41,7 +41,7 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
     // Initialize the front layer.
     DagGraph::edge_iterator ei, ei_end;
     for (boost::tie(ei, ei_end) = boost::edges(dag.graph); ei != ei_end; ++ei) {
-        if ( boost::source(*ei, dag.graph) == 0) {
+        if ( boost::source(*ei, dag.graph) == dag.start_node_pos) {
             const auto target = boost::target(*ei, dag.graph);
             pre_executed_counts[target]++;
             if ((pre_executed_counts[target] == 2) || (dag.graph[target].qubit_pos.size() == 1)) {
@@ -133,6 +133,10 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
             qubits_decay[best_swap.second] += decay_delta;
         } 
     }
+
+    // Update model
+    this->model->final_layout = current_layout;
+
 
     if (this->modify_dag)   {
         return mapped_dag;

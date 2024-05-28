@@ -43,9 +43,9 @@ def get_preset_model():
 
 def get_random_qc():
     gate_list = ['cx', 'rxx', 'h']
-    rqc = RandomCircuit(num_qubit=4, gates_number = 5000, gates_list=gate_list)
+    rqc = RandomCircuit(num_qubit=4, gates_number = 500, gates_list=gate_list)
     qc = rqc.random_circuit()
-    # qc.measure([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])
+    qc.measure([0, 1, 2, 3], [0, 1, 2, 3])
     #qc.plot_circuit()
     #plt.show()
 
@@ -82,14 +82,27 @@ def test_dag():
     # draw_dag(dag)
 
     dag = QuantumCircuit_to_cppDag(simple)
-    print(dag.measure)
+    # qc = cppDag_to_QuantumCircuit(dag)
 
-    return dag 
+
+    return simple, dag
 
 
 
 if __name__ == "__main__":
-    # c_circuit, c_circuit_cpp = test_coupling()
-    dag = test_dag()
-    dag.draw_self()
+    c_circuit, c_circuit_cpp = test_coupling()
+    model = get_preset_model()
+
+    qc = get_random_qc()
+    dag = circuit_to_dag(qc)
+
+    dag_cpp = QuantumCircuit_to_cppDag(qc)
+
+    sabre_layout = SabreLayout_cpp(c_circuit_cpp)
+    dag_cpp = sabre_layout.run(dag_cpp)
+
+
+
+
+
     

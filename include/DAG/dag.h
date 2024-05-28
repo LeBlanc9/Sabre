@@ -30,8 +30,6 @@ public:
     DagGraph graph;
     std::unordered_map<qubit_t, cbit_t> measure = {};
 
-private:
-
     node_pos_t start_node_pos = 0;
     node_pos_t end_node_pos = 1;
 
@@ -119,14 +117,10 @@ public:
         rev_dag.end_node_pos = this->start_node_pos;
         rev_dag.graph[rev_dag.start_node_pos].name = "start";
         rev_dag.graph[rev_dag.end_node_pos].name = "end";
-        // rev_dag.graph[end_node_pos].name = "end";
 
         return rev_dag;
     }
 
-    void remove_measure_nodes(){
-        boost::remove_vertex(0, graph); 
-    } 
 
 
     DagGraph::vertex_iterator vertex_begin() const{
