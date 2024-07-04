@@ -130,8 +130,6 @@ public:
         return boost::vertices(graph).second;
     }
 
-    void draw_self() const;
-    void print_self() const;
 
 private:
     bool _is_start_exist() const {

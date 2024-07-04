@@ -2,13 +2,11 @@
 #include "sabre_layout.h"
 #include "DAG/dag.h"
 #include "coupling.h"
-#include "vis.h"
+#include "visualization.h"
 #include "layout.h"
 
-#include <boost/graph/graphviz.hpp>
 #include <boost/graph/graph_utility.hpp>
 #include <iomanip>
-#include <graphviz/gvc.h>
 
 DAGCircuit test_dag() {
     DagGraph test_graph;
@@ -49,7 +47,7 @@ void test_sabre_routing() {
     CouplingCircuit c_circuit = test_c_ciruit();
     DAGCircuit dag = test_dag();
 
-    c_circuit.draw_self();
+    // c_circuit.draw_self();
     SabreRouting sabre_routing{c_circuit};
     sabre_routing.run(dag);
 }
@@ -59,7 +57,10 @@ void test_sabre_layout() {
     CouplingCircuit c_circuit = test_c_ciruit();
     SabreLayout sabre_layout{c_circuit};
     DAGCircuit dag = test_dag();
+    Vis::draw_graph(dag.graph);
     sabre_layout.run(dag);
+
+}
 
 
 int main() {
@@ -68,4 +69,7 @@ int main() {
     // test_sabre_routing();
     // test_dag();
     test_sabre_layout();
+
+
+
 }

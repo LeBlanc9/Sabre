@@ -45,8 +45,4 @@ public:
     }
 
 
-    void draw_self() const;
-    void print_self() const;
-
-private:
 };

@@ -8,6 +8,12 @@ sys.path.append("/Users/air/workspace/qusteed")
 from qusteed.dag.dag_circuit import DAGCircuit
 from qusteed.dag.circuit_dag  import circuit_to_dag, dag_to_circuit, draw_dag
 from qusteed.dag.instruction_node import InstructionNode 
+from qusteed.compiler.transpiler import Transpiler
+from qusteed.passes.unroll.unroll_to_basis import UnrollToBasis
+from qusteed.passes.optimization.optimization_combine import GateOptimization
+from qusteed.passes.unroll.unroll_to_2qubit import UnrollTo2Qubit
+from qusteed.passes.model import Model
+from qusteed.backends.backend import Backend
 
 
 from quafu import QuantumCircuit
@@ -17,7 +23,7 @@ from quafu.elements.quantum_gate import ParametricGate
 
 
 def dag_to_cppDag(dag: DAGCircuit) -> Cpp_DAGCircuit:
-    cppDag = Cpp_DAGCircuit();
+    cppDag = Cpp_DAGCircuit()
 
     # Add node
     for index, node in enumerate(dag.nodes(data=True)):
@@ -235,23 +241,88 @@ gate_classes = {
 
 
 
-
 from build.sabre import SabreLayout as Cpp_SabreLayout
+from build.sabre import SabreRouting as Cpp_SabreRouting
 from build.sabre import Model as Cpp_Model
+from build.sabre import CouplingCircuit as CouplingCircuit_cpp
+
 
 class SabreLayout_():
     def __init__(self) -> None:
-        self.sabre_layout = Cpp_SabreLayout()
+        self.sabre_layout = None
 
     def set_model(self, model):
-        cpp_model = Cpp_Model()
-        cpp_model.couple_list = model.couple_list
+        c_list = model.get_backend().get_property("coupling_list") 
+        c_circuit = CouplingCircuit_cpp(c_list)
 
+        self.sabre_layout = Cpp_SabreLayout(c_circuit)
 
     def run(self, dag):
+        if isinstance(dag, DAGCircuit):
+            dag = dag_to_cppDag(dag)
+
+        elif isinstance(dag, QuantumCircuit):
+            dag = QuantumCircuit_to_cppDag(dag)
+
         self.sabre_layout.run(dag)
 
 
 
+
+class SabreRouting_():
+    def __init__(self) -> None:
+        # self.sabre_routing = Cpp_SabreRouting()
+        self.sabre_routing = None
+
+    def set_model(self, model):
+        c_list = model.get_backend().get_property("coupling_list") 
+        c_circuit = CouplingCircuit_cpp(c_list)
+
+        self.sabre_routing = Cpp_SabreRouting(c_circuit)
+
+    def run(self, dag):
+        if isinstance(dag, DAGCircuit):
+            dag = dag_to_cppDag(dag)
+
+        elif isinstance(dag, QuantumCircuit):
+            dag = QuantumCircuit_to_cppDag(dag)
+
+        self.sabre_layout.run(dag)
+
+
+
+
 if __name__ == "__main__":
-    pass
+    import time
+    from qusteed.utils.random_circuit import RandomCircuit 
+
+    basis_gates = ['cx','rx','ry','rz','id','h']
+    c_list = [ (0, 1, 0.98), (1, 0, 0.98), (1, 2, 0.97), (2, 1, 0.97),(2, 3, 0.982), (3, 2, 0.982)]
+
+
+    passflow = [
+                UnrollTo2Qubit(),
+                # SabreLayout_(heuristic='distance', max_iterations=3),  # heuristic='distance' or 'fidelity', 'mixture'
+                SabreLayout_(),  # heuristic='distance' or 'fidelity', 'mixture'
+                UnrollToBasis(basis_gates=basis_gates),
+                # GateOptimization(),
+            ]
+
+    backend_properties = {
+        'name': 'ExampleBackend',
+        'backend_type': 'superconducting',
+        'qubits_num': 4,
+        'coupling_list': c_list,
+    }
+    backend_instance = Backend(**backend_properties)
+    initial_model = Model(backend=backend_instance)
+
+
+    rqc = RandomCircuit(num_qubit=4, gates_number=30, gates_list=['cx', 'rx', 'rz', 'ry', 'h'])
+    qc = rqc.random_circuit()
+    qc.measure([0, 1, 2, 3], [0, 1, 2, 3])   
+
+    st = time.time()
+    compiler = Transpiler(passflow, initial_model)
+    compiled_circuit = compiler.transpile(qc)
+    print('qusteed time (s):', time.time() - st)

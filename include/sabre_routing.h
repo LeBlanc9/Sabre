@@ -23,9 +23,9 @@ public:
     int extended_set_size = 20;
     float extended_set_weight = 0.5;
     std::shared_ptr<Model> model;
+    CouplingCircuit c_circuit;
 
 private:
-    const CouplingCircuit& c_circuit;
     const Matrix distance_matrix = c_circuit.get_distance_matrix();
     Heuristic heuristic = Heuristic::Distance;
     std::unordered_map<int, int> qubits_decay = {};
@@ -33,6 +33,7 @@ private:
 
 public:
     SabreRouting(const CouplingCircuit& c_circuit) : c_circuit(c_circuit) {}
+    // SabreRouting() = default;
 
     void set_model(Model& model) { 
         this->model = std::make_shared<Model>(model); 

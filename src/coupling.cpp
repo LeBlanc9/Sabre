@@ -1,5 +1,4 @@
 #include "coupling.h"
-#include "vis.h"
 #include <set>
 #include <algorithm>
 #include <iostream>
@@ -28,9 +27,3 @@ CouplingCircuit::CouplingCircuit(CouplingList c_list) : c_list(c_list) {
     } 
 }
 
-
-
-
-
-void CouplingCircuit::draw_self() const { draw_dot(graph_to_dot(graph)); }
-void CouplingCircuit::print_self() const { print_graph(graph); }

@@ -1,19 +1,8 @@
 #include <set>
 #include "DAG/dag.h"
-#include "vis.h"
 #include <boost/graph/reverse_graph.hpp>
 #include <boost/graph/copy.hpp>
 #include <boost/graph/graph_utility.hpp>
-
-
-
-void DAGCircuit::draw_self() const { 
-    draw_dot(graph_to_dot(this->graph)); 
-}
-
-void DAGCircuit::print_self() const { 
-    print_graph(this->graph);
-}
 
 
 // Utils Function

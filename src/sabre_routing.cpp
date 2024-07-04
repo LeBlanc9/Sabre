@@ -4,6 +4,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <vector>
 #include <algorithm>
+
 #include "layout.h"
 #include "sabre_routing.h"
 
@@ -17,8 +18,10 @@ DAGCircuit SabreRouting::run(const DAGCircuit& dag) {
         std::cerr << "Warning: single qubit circuit no need optimize." << std::endl;
         return dag; 
     }
-    if (qubits_used.size() > this->c_circuit.num_qubits)   
+
+    if (qubits_used.size() > this->c_circuit.num_qubits) {
         throw std::runtime_error("More virtual qubits than physical qubits.");
+    }
 
     for(const auto& qubit : qubits_used)
         this->qubits_decay[qubit] = 1;

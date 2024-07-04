@@ -13,11 +13,12 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(sabre, m) {
-    m.doc() = "For Sabre"; // optional module docstring
+    m.doc() = "Sabre Algorithm"; // optional module docstring
 
     py::class_<SabreLayout>(m, "SabreLayout")
         .def(py::init<const CouplingCircuit&>()) 
-        .def("run", &SabreLayout::run );
+        .def("run", &SabreLayout::run )
+        .def_readwrite("c_circuit", &SabreLayout::c_circuit);
 
      py::class_<SabreRouting>(m, "SabreRouting")
         .def(py::init<const CouplingCircuit&>()) 
@@ -40,8 +41,7 @@ PYBIND11_MODULE(sabre, m) {
         .def(py::init<CouplingList>())
         .def("update_num_qubits", &CouplingCircuit::update_num_qubits)
         .def("get_distance_matrix", &CouplingCircuit::get_distance_matrix)
-        .def("draw_self", &CouplingCircuit::draw_self)
-        .def("print_self", &CouplingCircuit::print_self);
+        .def_readwrite("num_qubits", &CouplingCircuit::num_qubits);
 
     py::class_<Layout>(m, "Layout")
         .def(py::init<>())
@@ -94,8 +94,6 @@ PYBIND11_MODULE(sabre, m) {
         .def("get_qubits_used", &DAGCircuit::get_qubits_used)
         .def("vertices", [](DAGCircuit &s) {return py::make_iterator(s.vertex_begin(), s.vertex_end());})
         .def("reverse", &DAGCircuit::reverse)
-        .def("draw_self", &DAGCircuit::draw_self)
-        .def("print_self", &DAGCircuit::print_self)
         .def_readwrite("graph", &DAGCircuit::graph)
         .def_readwrite("measure", &DAGCircuit::measure);
 

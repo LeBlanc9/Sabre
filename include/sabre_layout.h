@@ -10,7 +10,7 @@
 class SabreLayout
 {
 public:
-    const CouplingCircuit& c_circuit;
+    CouplingCircuit c_circuit;
     std::shared_ptr<Model> model;
     std::unique_ptr<SabreRouting> routing;
     Heuristic heuristic = Heuristic::Distance;
@@ -28,13 +28,18 @@ public:
     }
 
     DAGCircuit run(const DAGCircuit& dag) {
-        std::cout << "Run sabre layout !" << std::endl;
-        //Precheck
+        // std::cout << "Run sabre layout !" << std::endl;
+        // Precheck
         std::set<int> qubits_used = dag.get_qubits_used();
         if (qubits_used.size() == 1) { 
             std::cerr << "Warning: single qubit circuit no need optimize." << std::endl;
             return dag; 
         }
+
+        // std::cout << "layout test" << std::endl;
+        // std::cout << "Qubits used: " << qubits_used.size() << std::endl;
+        // std::cout << "Circuit qubits: " << this->c_circuit.num_qubits << std::endl;
+
         if (qubits_used.size() > this->c_circuit.num_qubits) {
             throw std::runtime_error("More virtual qubits than physical qubits.");
         }
@@ -50,13 +55,13 @@ public:
             for (const auto& direction : {0, 1}) {
                 this->run_single(direction == 0 ? dag : rev_dag);
                 this->model->init_layout = this->model->final_layout;
-                print_layout(this->model->init_layout.get_p2v());
             }
         }
 
         // The last forward iteration obtains the final circuit.
         this->routing->modify_dag = true;
         DAGCircuit physical_dag = this->run_single(dag);
+        // print_layout(this->model->init_layout.get_p2v());
 
 
         // Add measurement, i.e. mapping of physical qubits to classic qubits
