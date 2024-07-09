@@ -1,7 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include "backend.h"
-#include "vis.h"
 #include "model.h"
 #include "coupling.h"
 #include "sabre_layout.h"
@@ -18,7 +17,9 @@ PYBIND11_MODULE(sabre, m) {
     py::class_<SabreLayout>(m, "SabreLayout")
         .def(py::init<const CouplingCircuit&>()) 
         .def("run", &SabreLayout::run )
-        .def_readwrite("c_circuit", &SabreLayout::c_circuit);
+        .def_readwrite("c_circuit", &SabreLayout::c_circuit)
+        .def_readwrite("max_iterations", &SabreLayout::max_iterations)
+        .def_readwrite("heuristic", &SabreLayout::heuristic);
 
      py::class_<SabreRouting>(m, "SabreRouting")
         .def(py::init<const CouplingCircuit&>()) 
@@ -97,5 +98,9 @@ PYBIND11_MODULE(sabre, m) {
         .def_readwrite("graph", &DAGCircuit::graph)
         .def_readwrite("measure", &DAGCircuit::measure);
 
+    py::enum_<Heuristic>(m, "Heuristic")
+        .value("DISTANCE", Heuristic::DISTANCE)
+        .value("FIDELITY", Heuristic::FIDELITY)
+        .value("MIXTURE", Heuristic::MIXTURE);
     // m.def("reverse_DagGraph", &reverse_DagGraph, "Reverse a DagGraph object");
 }

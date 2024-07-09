@@ -4,7 +4,6 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <vector>
 #include <algorithm>
-
 #include "layout.h"
 #include "sabre_routing.h"
 
@@ -223,7 +222,7 @@ SwapPos SabreRouting::_get_best_swap(   const DAGCircuit& dag,
         swap_scores[swap] = -1000000; 
 
     // TODO
-    if ( this->heuristic == Heuristic::Fidelity ) {
+    if ( this->heuristic == Heuristic::FIDELITY ) {
         for ( const auto& swap : swap_candidates )  {
             SwapPos physical_swap = std::minmax(physical_swap.first, physical_swap.second);
             if (unavailable_2qubits.find(physical_swap) == unavailable_2qubits.end()) {
@@ -233,7 +232,7 @@ SwapPos SabreRouting::_get_best_swap(   const DAGCircuit& dag,
         }
     }
 
-    else if ( this->heuristic == Heuristic::Distance ) {
+    else if ( this->heuristic == Heuristic::DISTANCE ) {
         for ( const auto& swap : swap_candidates) {
             double score = _score_heuristic(dag, front_layer, extended_set, current_layout, swap);
             swap_scores[swap] = score;
@@ -248,7 +247,7 @@ SwapPos SabreRouting::_get_best_swap(   const DAGCircuit& dag,
     }
 
     // TODO
-    else if ( this->heuristic == Heuristic::Mixture )
+    else if ( this->heuristic == Heuristic::MIXTURE )
     {}
 
     return {0,0};
@@ -263,7 +262,7 @@ double SabreRouting::_score_heuristic(  const DAGCircuit& dag,
     Layout trial_layout = Layout(current_layout);
     trial_layout.swap(swap_pos.first, swap_pos.second);
 
-    if ( heuristic == Heuristic::Distance ) {
+    if ( heuristic == Heuristic::DISTANCE) {
         double front_cost = _compute_distance_cost(dag, front_layer, trial_layout) / static_cast<double>(front_layer.size());
         double extended_cost = 0; 
         if ( !extended_set.empty() ) {

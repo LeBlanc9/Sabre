@@ -5,7 +5,6 @@
 Model::Model() {
     // std::cout << "Empty model created" << std::endl;
     // generate_random_layout();
-
 }
 
 Model::Model(Backend backend) : _backend(backend) {

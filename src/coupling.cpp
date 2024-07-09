@@ -26,4 +26,3 @@ CouplingCircuit::CouplingCircuit(CouplingList c_list) : c_list(c_list) {
         boost::add_edge(std::get<0>(link), std::get<1>(link), c_egde, graph);
     } 
 }
-

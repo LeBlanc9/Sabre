@@ -13,8 +13,8 @@ public:
     CouplingCircuit c_circuit;
     std::shared_ptr<Model> model;
     std::unique_ptr<SabreRouting> routing;
-    Heuristic heuristic = Heuristic::Distance;
-    int max_iteration = 3; 
+    Heuristic heuristic = Heuristic::DISTANCE;
+    int max_iterations = 3; 
 
 public:
     SabreLayout(const CouplingCircuit& c_circuit);
@@ -51,7 +51,7 @@ public:
         DAGCircuit rev_dag = dag.reverse();
 
         // Start Iteration 
-        for (int i=0; i < max_iteration; i++) {
+        for (int i=0; i < max_iterations; i++) {
             for (const auto& direction : {0, 1}) {
                 this->run_single(direction == 0 ? dag : rev_dag);
                 this->model->init_layout = this->model->final_layout;

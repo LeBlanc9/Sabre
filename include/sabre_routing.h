@@ -10,9 +10,9 @@
 using SwapPos = std::pair<int, int>;
 
 enum class Heuristic {
-    Fidelity,
-    Distance,
-    Mixture  
+    FIDELITY,
+    DISTANCE,
+    MIXTURE,
 };
 
 class SabreRouting {
@@ -27,7 +27,7 @@ public:
 
 private:
     const Matrix distance_matrix = c_circuit.get_distance_matrix();
-    Heuristic heuristic = Heuristic::Distance;
+    Heuristic heuristic = Heuristic::DISTANCE;
     std::unordered_map<int, int> qubits_decay = {};
     int add_swap_counter = 0;
 
