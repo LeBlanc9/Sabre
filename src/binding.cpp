@@ -10,13 +10,15 @@
 
 
 namespace py = pybind11;
+using namespace sabre;
 
 PYBIND11_MODULE(sabre, m) {
     m.doc() = "Sabre Algorithm"; // optional module docstring
 
     py::class_<SabreLayout>(m, "SabreLayout")
         .def(py::init<const CouplingCircuit&>()) 
-        .def("run", &SabreLayout::run )
+        .def("run", &SabreLayout::run)
+        .def("get_model", &SabreLayout::get_model)
         .def_readwrite("c_circuit", &SabreLayout::c_circuit)
         .def_readwrite("max_iterations", &SabreLayout::max_iterations)
         .def_readwrite("heuristic", &SabreLayout::heuristic);
@@ -35,7 +37,8 @@ PYBIND11_MODULE(sabre, m) {
     py::class_<Model>(m, "Model")
         .def(py::init<>())
         .def(py::init<Backend>())
-        .def_readwrite("init_layout", &Model::init_layout);
+        .def_readwrite("init_layout", &Model::init_layout)
+        .def_readwrite("final_layout", &Model::final_layout);
 
 
     py::class_<CouplingCircuit>(m, "CouplingCircuit")
@@ -47,6 +50,7 @@ PYBIND11_MODULE(sabre, m) {
     py::class_<Layout>(m, "Layout")
         .def(py::init<>())
         .def(py::init<LayoutStructure>())
+        .def("get_v2p", &Layout::get_v2p)
         .def("__getitem__", &Layout::operator[]);
 
     py::class_<InstructionNode>(m, "InstructionNode")

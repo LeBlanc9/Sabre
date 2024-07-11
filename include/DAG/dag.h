@@ -12,7 +12,7 @@
 #include "instructionNode.h"
 #include "edge.h"
 
-
+using namespace sabre;
 
 using DagGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, InstructionNode, EdgeProperties>;
 

@@ -9,6 +9,7 @@ from qc_converter import *
 class SabreRouting_():
     """
     A class representing the SabreRouting algorithm.
+    It can be used by transpiler directly as a pass.
 
     Args:
         heuristic (str): The heuristic to be used for routing. Can be one of "distance", "fidelity", or "mixture".
@@ -34,7 +35,7 @@ class SabreRouting_():
 
     def set_model(self, model):
         """
-        Set the model of backend.
+        Set the model.
 
         Args:
             model: The model to be set.

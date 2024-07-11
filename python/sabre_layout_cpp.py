@@ -2,15 +2,14 @@ from build.sabre import SabreLayout as Cpp_SabreLayout
 from build.sabre import CouplingCircuit as CouplingCircuit_cpp
 from build.sabre import Heuristic
 
-
 from dag_converter import *
 from qc_converter import *
-
 
 
 class SabreLayout_():
     """
     SabreLayout_ class represents a layout algorithm for quantum circuits using the SabreLayout technique.
+    It can be used by transpiler directly as a pass.
 
     Args:
         heuristic (str): The heuristic to be used for layout optimization. Possible values are "distance", "fidelity", and "mixture".
@@ -25,19 +24,13 @@ class SabreLayout_():
         self.sabre_layout = None
         self.model = None
 
-        if heuristic == "distance":
-            self.heuristic = Heuristic.DISTANCE
-        elif heuristic == "fidelity": 
-            self.heuristic = Heuristic.FIDELITY
-        elif heuristic == "mixture":
-            self.heuristic = Heuristic.MIXTURE
-
+        self.heuristic = self.choose_heuristic(heuristic)
         self.max_iterations = max_iterations
 
 
     def set_model(self, model):
         """
-        Sets the model of backend.
+        Sets the model.
 
         Args:
             model: The model to be set.
@@ -49,6 +42,13 @@ class SabreLayout_():
         self.sabre_layout = Cpp_SabreLayout(c_circuit)
         self.sabre_layout.heuristic = self.heuristic
         self.sabre_layout.max_iterations = self.max_iterations
+
+
+    def get_model(self):
+        self.model._layout["final_layout"] = self.sabre_layout.get_model().final_layout.get_v2p()
+        self.model._layout["initial_layout"] = self.sabre_layout.get_model().init_layout.get_v2p()
+        # print(self.model)
+        return self.model  
 
 
     def run(self, dag):
@@ -70,3 +70,18 @@ class SabreLayout_():
             dag = QuantumCircuit_to_cppDag(dag)
             self.sabre_layout.run(dag)
             return cppDag_to_QuantumCircuit(dag)
+
+
+    def choose_heuristic(self, heuristic):
+        """
+        Chooses the heuristic for the layout optimization.
+
+        Args:
+            heuristic: The heuristic to be chosen.
+        """
+        if heuristic == "distance":
+            return Heuristic.DISTANCE
+        elif heuristic == "fidelity": 
+            return Heuristic.FIDELITY
+        elif heuristic == "mixture":
+            return Heuristic.MIXTURE

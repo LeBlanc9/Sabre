@@ -3,6 +3,7 @@
 #include <string>
 #include "sabre_core.h"
 
+using namespace sabre;
 
 struct InstructionNode 
 {

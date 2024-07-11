@@ -1,6 +1,8 @@
 #pragma once
 #include "sabre_core.h"
 
+using namespace sabre;
+
 struct EdgeProperties 
 {
 public:

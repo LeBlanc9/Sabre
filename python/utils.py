@@ -27,16 +27,16 @@ if __name__ == "__main__":
 
 
     passflow_cpp = [
-                UnrollTo2Qubit(),
+                # UnrollTo2Qubit(),
                 SabreLayout_(),  # heuristic='distance' or 'fidelity', 'mixture'
-                UnrollToBasis(basis_gates=basis_gates),
+                # UnrollToBasis(basis_gates=basis_gates),
                 # GateOptimization(),
             ]
 
     passflow_python = [
-                UnrollTo2Qubit(),
+                # UnrollTo2Qubit(),
                 SabreLayout(),  # heuristic='distance' or 'fidelity', 'mixture'
-                UnrollToBasis(basis_gates=basis_gates),
+                # UnrollToBasis(basis_gates=basis_gates),
                 # GateOptimization(),
     ]
 
@@ -47,7 +47,8 @@ if __name__ == "__main__":
         'coupling_list': c_list,
     }
     backend_instance = Backend(**backend_properties)
-    initial_model = Model(backend=backend_instance)
+    initial_model_1 = Model(backend=backend_instance)
+    initial_model_2 = Model(backend=backend_instance)
 
 
     rqc = RandomCircuit(num_qubit=4, gates_number=3000, gates_list=['cx', 'rx', 'rz', 'ry', 'h'])
@@ -55,13 +56,13 @@ if __name__ == "__main__":
     qc.measure([0, 1, 2, 3], [0, 1, 2, 3])   
 
     st = time.time()
-    compiler = Transpiler(passflow_cpp, initial_model)
+    compiler = Transpiler(passflow_cpp, initial_model_1)
     compiled_circuit_cpp = compiler.transpile(qc)
     print('qusteed time cpp (s):', time.time() - st)
 
 
     st = time.time()
-    compiler = Transpiler(passflow_python, initial_model)
+    compiler = Transpiler(passflow_python, initial_model_2)
     compiled_circuit_python = compiler.transpile(qc)
     print('qusteed time python (s):', time.time() - st)
 
@@ -79,5 +80,7 @@ if __name__ == "__main__":
     simu_res_python = simulate(compiled_circuit_python, output="probabilities")
     simu_res_python.plot_probabilities()
     plt.title("Python")
-
     plt.show()
+
+    print(initial_model_1.get_layout())
+    print(initial_model_2.get_layout())
