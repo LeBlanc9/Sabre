@@ -1,0 +1,12 @@
+[build-system]
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+
+[project]
+name = "sabre"
+version = "0.0.1"
+
+
+[tool.scikit-build]
+minimum-version = "0.2"

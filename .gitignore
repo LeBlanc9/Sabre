@@ -9,3 +9,6 @@ __pycache__/
 
 # For MacOS
 .DS_Store
+
+# For testing of pip install
+dist/

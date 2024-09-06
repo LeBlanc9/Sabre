@@ -1,9 +1,9 @@
 ## Project Setting
-cmake_minimum_required(VERSION 3.14)
-project(Sabre LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.15...3.29)
+project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "Build type not set - defaulting to Release")
@@ -11,65 +11,65 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 
-# Python Setting
-set(Python_FIND_STRATEGY LOCATION)
-set(Python_ROOT_DIR /Users/air/anaconda3/envs/quantum)
-find_package(Python 3.10 COMPONENTS Interpreter Development REQUIRED)
-
-# Boost lib
-set(Boost_ROOT "/opt/homebrew/opt/boost")
+# Find Boost
 find_package(Boost REQUIRED)
-if (Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    MESSAGE( STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}.")
+if(Boost_FOUND)
+  if(NOT TARGET Boost::headers)
+    add_library(Boost::headers IMPORTED INTERFACE)
+    if(TARGET Boost::boost)
+      # Classic FindBoost
+      set_property(TARGET Boost::boost PROPERTY INTERFACE_LINK_LIBRARIES Boost::boost)
+    else()
+      # Very old FindBoost, or newer Boost than CMake in older CMakes
+      set_property(TARGET Boost::headers PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
+    endif()
+  endif()
 endif()
 
-# Graphviz lib
-set(Graphviz_INCLUDE_DIRS "/opt/homebrew/Cellar/graphviz/10.0.1/include/")
-include_directories(${Graphviz_INCLUDE_DIRS})
-link_directories("/opt/homebrew/Cellar/graphviz/10.0.1/lib")
+
+# Find Python
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
+message(STATUS "Python Interpreter: ${Python_EXECUTABLE}")
+message(STATUS "Python Version: ${Python_VERSION}")
+message(STATUS "Python Include Dir: ${Python_INCLUDE_DIRS}")
+message(STATUS "Python Libraries: ${Python_LIBRARIES}")
+
+# Find pybind11
+add_subdirectory(extern/pybind11)
 
 
-include_directories("extern/pybind11/include")
-
-include_directories(
-    "include" 
-    "include/DAG" 
-    "include/Vis"
-    "include/Model"
-)
-
-##! Test CPP  设置包含src目录下除了binding.cpp之外的所有文件
+## Test CPP  设置包含src目录下除了binding.cpp之外的所有文件
 file(GLOB SOURCES "src/*.cpp")
-list(FILTER SOURCES EXCLUDE REGEX "src/binding.cpp")
 file(GLOB DAG_SOURCES "src/DAG/*.cpp")
 file(GLOB Vis_SOURCES "src/Vis/*.cpp")
 file(GLOB Model_SOURCES "src/Model/*.cpp")
 
-add_executable(
-    sabre_test 
+set(target sabre)
+pybind11_add_module(
+    ${target} 
+        src/Binding/binding.cpp 
         ${SOURCES} 
         ${DAG_SOURCES}
         ${Model_SOURCES}
 )
-target_link_libraries(sabre_test ${Boost_LIBRARIES}) # Boost
+target_include_directories(
+    ${target} 
+    PRIVATE 
+        "include" 
+        "include/DAG" 
+        "include/Vis"
+        "include/Model"
+)    
 
-option(BUILD_VIS "Build the Vis module for cpp test" ON)
-if(BUILD_VIS)
-    add_compile_definitions(-DVIS)
-    target_sources(sabre_test PRIVATE ${Vis_SOURCES})
-    target_link_libraries(sabre_test gvc cgraph)         # Graphviz
+
+target_link_libraries(sabre PRIVATE pybind11::headers)
+
+
+if(Boost_FOUND)
+    target_link_libraries(${target} PRIVATE Boost::headers)
+    target_compile_definitions(${target} PRIVATE BOOST_NO_CXX98_FUNCTION_BASE)
 endif()
 
 
-
-## Pybind For Python Binding.
-add_subdirectory("extern/pybind11")
-pybind11_add_module(
-    sabre 
-        src/binding.cpp 
-        ${SOURCES} 
-        ${DAG_SOURCES}
-        ${Model_SOURCES}
-)
-target_link_libraries(sabre PRIVATE ${Boost_LIBRARIES}) # Boost
+# Install
+install(TARGETS sabre LIBRARY DESTINATION .)

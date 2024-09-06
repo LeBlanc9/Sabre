@@ -69,7 +69,4 @@ int main() {
     // test_sabre_routing();
     // test_dag();
     test_sabre_layout();
-
-
-
 }
