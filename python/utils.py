@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
 
     basis_gates = ['cx','rx','ry','rz','id','h']
-    c_list = [ (0, 1, 0.98), (1, 0, 0.98), (1, 2, 0.97), (2, 1, 0.97),(2, 3, 0.982), (3, 2, 0.982)]
+    c_list = [ (0, 1, 0.98), (1, 0, 0.98), (1, 2, 0.97), (2, 1, 0.97),(2, 3, 0.982), (3, 2, 0.982), (3,4, 0.99), (4,3, 0.99)]
 
 
     passflow_cpp = [
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     backend_properties = {
         'name': 'ExampleBackend',
         'backend_type': 'superconducting',
-        'qubits_num': 4,
+        'qubits_num': 5,
         'coupling_list': c_list,
     }
     backend_instance = Backend(**backend_properties)
@@ -51,9 +51,9 @@ if __name__ == "__main__":
     initial_model_2 = Model(backend=backend_instance)
 
 
-    rqc = RandomCircuit(num_qubit=4, gates_number=3000, gates_list=['cx', 'rx', 'rz', 'ry', 'h'])
+    rqc = RandomCircuit(num_qubit=5, gates_number=3000, gates_list=['cx', 'rx', 'rz', 'ry', 'h'])
     qc = rqc.random_circuit()
-    qc.measure([0, 1, 2, 3], [0, 1, 2, 3])   
+    qc.measure([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])   
 
     st = time.time()
     compiler = Transpiler(passflow_cpp, initial_model_1)

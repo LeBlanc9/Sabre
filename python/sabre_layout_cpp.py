@@ -30,7 +30,7 @@ class SabreLayout_():
 
     def set_model(self, model):
         """
-        Sets the model.
+        Sets the model. Includes information such as backend and layout.
 
         Args:
             model: The model to be set.

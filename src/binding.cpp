@@ -7,6 +7,7 @@
 #include "sabre_routing.h"
 #include "DAG/dag.h"
 #include "layout.h"
+#include "parameter.h"
 
 
 namespace py = pybind11;
@@ -60,6 +61,12 @@ PYBIND11_MODULE(sabre, m) {
         .def(py::init<const std::string, const std::vector<int>>())
         .def(py::init<const std::string, const int>())
 
+
+        // for Parameter 
+        .def(py::init<const std::string, const int, const std::vector<Parameter>, const int, const std::string>())
+        .def(py::init<const std::string, const std::vector<int>, const std::vector<Parameter>, const int, const std::string>())
+
+        // for paras
         .def(py::init<const std::string, const int, const std::vector<double>, const int, const std::string>())
         .def(py::init<const std::string, const std::vector<int>, const std::vector<double>, const int, const std::string>())
         .def(py::init<const std::string, const int, const double, const int, const std::string>())
@@ -68,6 +75,7 @@ PYBIND11_MODULE(sabre, m) {
         .def_readwrite("name", &InstructionNode::name)
         .def_readwrite("qubit_pos", &InstructionNode::qubit_pos)
         .def_readwrite("paras", &InstructionNode::paras)
+        .def_readwrite("parameter", &InstructionNode::parameters)
         .def_readwrite("duration", &InstructionNode::duration)
         .def_readwrite("unit", &InstructionNode::unit);
 
@@ -107,4 +115,47 @@ PYBIND11_MODULE(sabre, m) {
         .value("FIDELITY", Heuristic::FIDELITY)
         .value("MIXTURE", Heuristic::MIXTURE);
     // m.def("reverse_DagGraph", &reverse_DagGraph, "Reverse a DagGraph object");
+
+
+    // Parameter
+    py::enum_<OperatorType>(m, "OperatorType")
+        .value("ADD", OperatorType::ADD)
+        .value("SUB", OperatorType::SUB)
+        .value("MUL", OperatorType::MUL)
+        .value("TRUEDIV", OperatorType::TRUEDIV)
+        .value("FLOORDIV", OperatorType::FLOORDIV)
+        .value("POW", OperatorType::POW)
+        .value("SIN", OperatorType::SIN)
+        .value("COS", OperatorType::COS)
+        .value("TAN", OperatorType::TAN)
+        .value("EXP", OperatorType::EXP)
+        .value("LOG", OperatorType::LOG)
+        .value("SQRT", OperatorType::SQRT)
+        .value("ABS", OperatorType::ABS)
+        .value("NEG", OperatorType::NEG)
+        .value("CONST", OperatorType::CONST);
+
+
+    py::enum_<ParameterType>(m, "ParameterType")
+        .value("None", ParameterType::None)
+        .value("DOUBLE", ParameterType::DOUBLE)
+        .value("PARAMETER", ParameterType::PARAMETER)
+        .value("PARAMETER_EXPRESSION", ParameterType::PARAMETER_EXPRESSION);
+
+    py::class_<ParameterExpression>(m, "ParameterExpression")
+        .def(py::init<>())
+        .def_readwrite("operands", &ParameterExpression::operands)
+        .def_readwrite("funcs", &ParameterExpression::operators);
+
+    py::class_<Parameter>(m, "Parameter")
+        .def(py::init<>())
+        .def(py::init<ParameterType, double>())
+        .def(py::init<ParameterType, const std::string, double>())
+        .def_readwrite("operands", &Parameter::operands)
+        .def_readwrite("funcs", &Parameter::operators)
+        .def_readwrite("type", &Parameter::ptype)
+        .def_readwrite("name", &Parameter::name)
+        .def_readwrite("value", &Parameter::value)
+        .def_readwrite("tunable", &Parameter::tunable);
+
 }

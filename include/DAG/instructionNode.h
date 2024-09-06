@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "sabre_core.h"
+#include "parameter.h"
 
 using namespace sabre;
 
@@ -28,6 +29,7 @@ public:
     std::vector<qubit_t> qubit_pos = {};
 
     std::vector<double> paras = {};
+    std::vector<Parameter> parameters;
 
     // for gate in [Delay,XYResonance] in quafu
     int duration = 0;   
@@ -45,6 +47,21 @@ public:
 
     InstructionNode(const std::string& name, const qubit_t qubit_pos) 
         : name(name), qubit_pos({qubit_pos}) {}
+
+
+    InstructionNode(const std::string& name, 
+                    const int qubit_pos, 
+                    const std::vector<Parameter> parameter, 
+                    const int duration, 
+                    const std::string unit) 
+        : name(name), qubit_pos({qubit_pos}), parameters(parameter), duration(duration), unit(unit) {}
+
+    InstructionNode(const std::string& name, 
+                    const std::vector<int> qubit_pos, 
+                    const std::vector<Parameter> parameter, 
+                    const int duration, 
+                    const std::string unit) 
+        : name(name), qubit_pos(qubit_pos), parameters(parameter), duration(duration), unit(unit) {}
 
 
     InstructionNode(const std::string& name, 

@@ -2,6 +2,8 @@ from build.sabre import DAGCircuit as Cpp_DAGCircuit
 from build.sabre import InstructionNode as Cpp_InstructionNode
 from build.sabre import MeasureNode as Cpp_MeasureNode
 from build.sabre import EdgeProperties
+from build.sabre import ParameterType as Cpp_ParameterType
+from build.sabre import Parameter as Cpp_Parameter
 
 import sys
 sys.path.append("/Users/air/workspace/qusteed")
